@@ -7,7 +7,9 @@ import {
   Body,
   ParseIntPipe,
   DefaultValuePipe,
+  BadRequestException,
 } from '@nestjs/common';
+import { CreateUserDto } from './dtos/create-User.dto';
 
 @Controller('users')
 export class UsersController {
@@ -24,8 +26,15 @@ export class UsersController {
   }
 
   @Post()
-  public CreateUsers(@Body() body: any) {
-    console.log(body);
+  public CreateUsers(@Body() createUserDto: CreateUserDto) {
+    const { password, passwordConfirm } = createUserDto;
+
+    // Ensure that password and passwordConfirm match
+    if (password !== passwordConfirm) {
+      throw new BadRequestException('Passwords do not match.');
+    }
+
+    console.log(createUserDto);
     return 'Post Users Endpoint';
   }
 }
