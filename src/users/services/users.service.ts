@@ -3,7 +3,7 @@ import { GetUserParamDto } from '../dtos/get-users-param.dto';
 
 @Injectable()
 export class UsersService {
-  public findAll(
+  public getAllUsers(
     getUserParamDto: GetUserParamDto,
     limit: number,
     page: number,
@@ -20,7 +20,7 @@ export class UsersService {
     ];
   }
 
-  public findOne(id: number) {
+  public getUser(id: number) {
     return {
       id: 123,
       name: 'test1',

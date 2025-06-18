@@ -28,7 +28,7 @@ export class UsersController {
     @Query('limit', new DefaultValuePipe(10), ParseIntPipe) limit: number,
     @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number,
   ) {
-    return this.usersService.findAll(getUserParamDto, limit, page);
+    return this.usersService.getAllUsers(getUserParamDto, limit, page);
   }
 
   @Post()
@@ -46,7 +46,7 @@ export class UsersController {
   }
 
   @Patch()
-  public patchUser(@Body() patchUserDto: PatchUserDto) {
+  public patchUsers(@Body() patchUserDto: PatchUserDto) {
     return patchUserDto;
   }
 }
