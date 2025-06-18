@@ -8,20 +8,21 @@ import {
   ParseIntPipe,
   DefaultValuePipe,
   BadRequestException,
+  Patch,
 } from '@nestjs/common';
-import { CreateUserDto } from './dtos/create-User.dto';
+import { CreateUserDto } from './dtos/create-user.dto';
+import { GetUserParamDto } from './dtos/get-users-param.dto';
+import { PatchUserDto } from './dtos/patch-user.dto';
 
 @Controller('users')
 export class UsersController {
   @Get('{/:id}')
   public getUsers(
-    @Param('id', ParseIntPipe) id: number | undefined,
+    @Param() getUserParamDto: GetUserParamDto,
     @Query('limit', new DefaultValuePipe(10), ParseIntPipe) limit: number,
     @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number,
   ) {
-    console.log(typeof id, id);
-    console.log(typeof limit, limit);
-    console.log(typeof page, page);
+    console.log(getUserParamDto);
     return 'Get Users Endpoint';
   }
 
@@ -34,7 +35,13 @@ export class UsersController {
       throw new BadRequestException('Passwords do not match.');
     }
 
-    console.log(createUserDto);
+    console.log(typeof createUserDto);
+    console.log(createUserDto instanceof CreateUserDto);
     return 'Post Users Endpoint';
+  }
+
+  @Patch()
+  public patchUser(@Body() patchUserDto: PatchUserDto) {
+    return patchUserDto;
   }
 }

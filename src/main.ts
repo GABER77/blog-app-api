@@ -8,9 +8,10 @@ async function bootstrap() {
   // Enable global validation pipe with strict rules
   app.useGlobalPipes(
     new ValidationPipe({
-      whitelist: true, // removes properties not defined in your DTO.
-      forbidNonWhitelisted: true, // throws error if extra fields are present.
-      stopAtFirstError: true, // stops showing multiple errors per property.
+      whitelist: true, // removes properties not defined in your DTO
+      forbidNonWhitelisted: true, // throws error if extra fields are present
+      stopAtFirstError: true, // stops showing multiple errors per property
+      transform: true, // transforms incoming request to match the DTO type
     }),
   );
 
