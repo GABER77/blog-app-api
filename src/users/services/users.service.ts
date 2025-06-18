@@ -20,7 +20,7 @@ export class UsersService {
     ];
   }
 
-  public getUser(id: number) {
+  public getUser(id: string) {
     return {
       id: 123,
       name: 'test1',
