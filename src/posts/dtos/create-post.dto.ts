@@ -9,9 +9,12 @@ import {
   IsUrl,
   Matches,
   MinLength,
+  ValidateNested,
 } from 'class-validator';
 import { postTypeEnum } from '../enums/postType.enum';
 import { postStatueEnum } from '../enums/postStatus.enum';
+import { CreatePostMetaOptonsDto } from './create-post-meta-options.dto';
+import { Type } from 'class-transformer';
 
 export class CreatePostDto {
   @IsString()
@@ -55,5 +58,9 @@ export class CreatePostDto {
   @IsOptional()
   tags?: string[];
 
-  metaOptions: [{ Key: 'closeFriendsOnly'; value: 'true' }];
+  @IsArray()
+  @IsOptional()
+  @ValidateNested({ each: true })
+  @Type(() => CreatePostMetaOptonsDto)
+  metaOptions: CreatePostMetaOptonsDto[];
 }
