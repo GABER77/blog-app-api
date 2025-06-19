@@ -3,6 +3,8 @@ import { AuthService } from './services/auth.service';
 
 @Controller('auth')
 export class AuthController {
-  // Injecting Auth Service
-  constructor(private readonly authService: AuthService) {}
+  constructor(
+    // Injecting AuthService
+    private readonly authService: AuthService,
+  ) {}
 }

@@ -14,7 +14,7 @@ import { CreateUserDto } from './dtos/create-user.dto';
 import { GetUserParamDto } from './dtos/get-users-param.dto';
 import { PatchUserDto } from './dtos/patch-user.dto';
 import { UsersService } from './services/users.service';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 
 @Controller('users')
 @ApiTags('Users')
@@ -25,6 +25,24 @@ export class UsersController {
   ) {}
 
   @Get('{/:id}')
+  @ApiOperation({
+    summary: 'Get all users or a specific user when ID is given.',
+  })
+  @ApiResponse({ status: 200 })
+  @ApiQuery({
+    name: 'limit',
+    type: 'number',
+    required: false,
+    description: 'The maximum number of results to return per page',
+    example: 10,
+  })
+  @ApiQuery({
+    name: 'page',
+    type: 'number',
+    required: false,
+    description: 'The page number you want the results to be returned from',
+    example: 2,
+  })
   public getUsers(
     @Param() getUserParamDto: GetUserParamDto,
     @Query('limit', new DefaultValuePipe(10), ParseIntPipe) limit: number,

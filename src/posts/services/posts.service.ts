@@ -3,8 +3,10 @@ import { UsersService } from 'src/users/services/users.service';
 
 @Injectable()
 export class PostsService {
-  // Injecting Users Service
-  constructor(private readonly usersService: UsersService) {}
+  constructor(
+    // Injecting Users Service
+    private readonly usersService: UsersService,
+  ) {}
 
   public getAllPosts(userId: string) {
     const user = this.usersService.getUser(userId);
