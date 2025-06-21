@@ -1,6 +1,7 @@
 import {
   IsEmail,
   IsNotEmpty,
+  IsOptional,
   IsString,
   Matches,
   MaxLength,
@@ -20,6 +21,7 @@ export class CreateUserDto {
 
   @IsString()
   @MinLength(8)
+  @MaxLength(32)
   @Matches(/^(?=.*[A-Za-z])(?=.*\d)(?=.*[^A-Za-z\d]).+$/, {
     message:
       'Password must include at least one letter, one number, and one special character.',
@@ -30,4 +32,8 @@ export class CreateUserDto {
   @IsString()
   @IsNotEmpty()
   passwordConfirm: string;
+
+  @IsOptional()
+  @IsString()
+  photo?: string;
 }
