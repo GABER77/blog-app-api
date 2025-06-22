@@ -1,12 +1,19 @@
 import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { GetUserParamDto } from '../dtos/get-users-param.dto';
 import { AuthService } from 'src/auth/services/auth.service';
+import { Repository } from 'typeorm';
+import { User } from '../user.entity';
+import { InjectRepository } from '@nestjs/typeorm';
 
 /** Class to connect to user table and perform business operations */
 @Injectable()
 export class UsersService {
   /**Constructor to inject dependencies */
   constructor(
+    // Injecting UserRepo
+    @InjectRepository(User)
+    private readonly userRepo: Repository<User>,
+
     // Injecting AuthService using Circular Dependency
     @Inject(forwardRef(() => AuthService))
     private readonly authService: AuthService,
