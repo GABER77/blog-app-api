@@ -10,7 +10,7 @@ export class User {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column({ type: 'varchar', length: 40 })
+  @Column({ length: 40 })
   name: string;
 
   @Column({ unique: true })

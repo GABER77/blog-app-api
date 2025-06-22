@@ -4,13 +4,14 @@ import { AuthService } from 'src/auth/services/auth.service';
 import { Repository } from 'typeorm';
 import { User } from '../user.entity';
 import { InjectRepository } from '@nestjs/typeorm';
+import { CreateUserDto } from '../dtos/create-user.dto';
 
 /** Class to connect to user table and perform business operations */
 @Injectable()
 export class UsersService {
   /**Constructor to inject dependencies */
   constructor(
-    // Injecting UserRepo
+    // Injecting User Repository
     @InjectRepository(User)
     private readonly userRepo: Repository<User>,
 
@@ -18,6 +19,18 @@ export class UsersService {
     @Inject(forwardRef(() => AuthService))
     private readonly authService: AuthService,
   ) {}
+
+  public async createUser(dto: CreateUserDto) {
+    // Check if user already exist
+    const user = await this.userRepo.findOne({
+      where: { email: dto.email },
+    });
+
+    let newUser = this.userRepo.create(dto);
+    newUser = await this.userRepo.save(newUser);
+
+    return newUser;
+  }
 
   /** Get all users from database */
   public getAllUsers(

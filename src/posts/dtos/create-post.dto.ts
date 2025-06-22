@@ -1,12 +1,12 @@
 import {
   IsArray,
   IsEnum,
-  IsJSON,
   IsNotEmpty,
   IsOptional,
   IsString,
   IsUrl,
   Matches,
+  MaxLength,
   MinLength,
   ValidateNested,
 } from 'class-validator';
@@ -21,6 +21,7 @@ export class CreatePostDto {
     example: 'This is the post title',
   })
   @IsString()
+  @MaxLength(500)
   @IsNotEmpty()
   title: string;
 
@@ -55,10 +56,6 @@ export class CreatePostDto {
   @IsString()
   @IsOptional()
   content?: string;
-
-  @IsJSON()
-  @IsOptional()
-  schema?: string;
 
   @ApiPropertyOptional({
     description: 'Image path for your post',

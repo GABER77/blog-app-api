@@ -60,9 +60,7 @@ export class UsersController {
       throw new BadRequestException('Passwords do not match.');
     }
 
-    console.log(typeof createUserDto);
-    console.log(createUserDto instanceof CreateUserDto);
-    return 'Post Users Endpoint';
+    return this.usersService.createUser(createUserDto);
   }
 
   @Patch()
