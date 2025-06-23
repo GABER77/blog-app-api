@@ -8,7 +8,7 @@ import {
 } from 'typeorm';
 import { postTypeEnum } from './enums/postType.enum';
 import { postStatusEnum } from './enums/postStatus.enum';
-import { metaOption } from 'src/meta-options/meta-options.entity';
+import { MetaOption } from 'src/meta-options/meta-option.entity';
 
 @Entity('posts')
 export class Post {
@@ -36,9 +36,9 @@ export class Post {
   @Column({ type: 'simple-array', nullable: true })
   tags?: string[];
 
-  @OneToOne(() => metaOption)
+  @OneToOne(() => MetaOption)
   @JoinColumn()
-  metaOptions?: metaOption;
+  metaOptions?: MetaOption;
 
   @CreateDateColumn()
   createdAt: Date;

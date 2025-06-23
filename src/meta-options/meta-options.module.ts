@@ -1,10 +1,12 @@
 import { Module } from '@nestjs/common';
 import { MetaOptionsController } from './meta-options.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { metaOption } from './meta-options.entity';
+import { MetaOption } from './meta-option.entity';
+import { MetaOptionsService } from './services/meta-options.service';
 
 @Module({
   controllers: [MetaOptionsController],
-  imports: [TypeOrmModule.forFeature([metaOption])],
+  imports: [TypeOrmModule.forFeature([MetaOption])],
+  providers: [MetaOptionsService],
 })
 export class MetaOptionsModule {}
