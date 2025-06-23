@@ -6,7 +6,7 @@ import {
 } from 'typeorm';
 import { postTypeEnum } from './enums/postType.enum';
 import { postStatusEnum } from './enums/postStatus.enum';
-import { CreatePostMetaOptonsDto } from './dtos/create-post-meta-options.dto';
+import { CreatePostMetaOptonsDto } from '../meta-options/dtos/create-post-meta-options.dto';
 import { text } from 'stream/consumers';
 
 @Entity('posts')
