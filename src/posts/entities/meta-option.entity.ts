@@ -6,13 +6,13 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 
-@Entity()
+@Entity('Meta_options')
 export class MetaOption {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column({ type: 'json' })
-  metaValue: string;
+  @Column({ type: 'jsonb' }) // Faster than json and supports indexing
+  data: Record<string, any>; // Allows dynamic key-value pairs
 
   @CreateDateColumn()
   createdAt: Date;

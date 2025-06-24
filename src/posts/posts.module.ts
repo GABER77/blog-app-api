@@ -3,8 +3,8 @@ import { PostsController } from './posts.controller';
 import { PostsService } from './services/posts.service';
 import { UsersModule } from 'src/users/users.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { Post } from './post.entity';
-import { MetaOption } from 'src/meta-options/meta-option.entity';
+import { Post } from './entities/post.entity';
+import { MetaOption } from 'src/posts/entities/meta-option.entity';
 
 @Module({
   controllers: [PostsController],

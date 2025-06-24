@@ -10,11 +10,12 @@ import {
   MinLength,
   ValidateNested,
 } from 'class-validator';
-import { postTypeEnum } from '../enums/postType.enum';
-import { postStatusEnum } from '../enums/postStatus.enum';
-import { CreatePostMetaOptonsDto } from '../../meta-options/dtos/create-post-meta-options.dto';
 import { Type } from 'class-transformer';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+
+import { postTypeEnum } from '../enums/postType.enum';
+import { postStatusEnum } from '../enums/postStatus.enum';
+import { CreatePostMetaOptonsDto } from './create-post-meta-options.dto';
 
 export class CreatePostDto {
   @ApiProperty({
@@ -33,22 +34,24 @@ export class CreatePostDto {
   postType: postTypeEnum;
 
   @ApiProperty({
-    example: 'my-example-url',
-  })
-  @IsString()
-  @Matches(/^[a-z0-9-]+$/, {
-    message:
-      'Slug can only contain lowercase letters, numbers, and the hyphen (-) symbol',
-  })
-  @IsNotEmpty()
-  slug: string;
-
-  @ApiProperty({
     enum: postStatusEnum,
   })
   @IsEnum(postStatusEnum)
   @IsNotEmpty()
   status: postStatusEnum;
+
+  @ApiProperty({
+    example: 'my-example-url',
+    description:
+      'Slug can only contain lowercase letters, numbers, and hyphens (-)',
+  })
+  @IsString()
+  @Matches(/^[a-z0-9-]+$/, {
+    message:
+      'Slug can only contain lowercase letters, numbers, and hyphens (-)',
+  })
+  @IsNotEmpty()
+  slug: string;
 
   @ApiPropertyOptional({
     example: 'This is the post ontent',
@@ -77,14 +80,17 @@ export class CreatePostDto {
 
   @ApiPropertyOptional({
     type: CreatePostMetaOptonsDto,
-    description: 'The metaValue is a JSON string',
+    description: 'Meta options as a key-value object',
     example: {
-      metaValue: '{"sidebarEnabled": true}',
+      data: {
+        sidebarEnabled: true,
+        allowComments: false,
+      },
     },
   })
   @IsOptional()
   @ValidateNested()
   // Convert each item to class instance so nested validation works
   @Type(() => CreatePostMetaOptonsDto)
-  metaOptions?: CreatePostMetaOptonsDto | null;
+  metaOptions?: CreatePostMetaOptonsDto;
 }

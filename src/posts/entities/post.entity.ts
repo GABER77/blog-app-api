@@ -6,9 +6,9 @@ import {
   OneToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
-import { postTypeEnum } from './enums/postType.enum';
-import { postStatusEnum } from './enums/postStatus.enum';
-import { MetaOption } from 'src/meta-options/meta-option.entity';
+import { postTypeEnum } from '../enums/postType.enum';
+import { postStatusEnum } from '../enums/postStatus.enum';
+import { MetaOption } from 'src/posts/entities/meta-option.entity';
 
 @Entity('posts')
 export class Post {
@@ -21,11 +21,11 @@ export class Post {
   @Column({ type: 'enum', enum: postTypeEnum })
   postType: postTypeEnum;
 
-  @Column({ unique: true })
-  slug: string;
-
   @Column({ type: 'enum', enum: postStatusEnum })
   status: postStatusEnum;
+
+  @Column({ unique: true })
+  slug: string;
 
   @Column({ type: 'text', nullable: true })
   content?: string;
@@ -37,9 +37,10 @@ export class Post {
   tags?: string[];
 
   @OneToOne(() => MetaOption, {
-    cascade: true,
+    cascade: true, // Automatically Creates MetaOption when a Post is created
+    eager: true, // Automatically load MetaOption whenever a Post is fetched
   })
-  @JoinColumn()
+  @JoinColumn({ name: 'metaOptionId' })
   metaOptions?: MetaOption;
 
   @CreateDateColumn()

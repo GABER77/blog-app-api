@@ -7,10 +7,7 @@ import { UpdatePostDto } from './dtos/update-post.dto';
 @Controller('posts')
 @ApiTags('Posts')
 export class PostsController {
-  constructor(
-    // Injecting Posts Service
-    private readonly postsService: PostsService,
-  ) {}
+  constructor(private readonly postsService: PostsService) {}
 
   @Get('{/:id}')
   public getPosts(@Param('id') userId: string) {
