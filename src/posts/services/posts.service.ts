@@ -1,10 +1,11 @@
-import { Body, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UsersService } from 'src/users/services/users.service';
 import { Repository } from 'typeorm';
 import { Post } from '../post.entity';
 import { CreatePostDto } from '../dtos/create-post.dto';
 import { MetaOption } from 'src/meta-options/meta-option.entity';
+import { DeepPartial } from 'typeorm';
 
 @Injectable()
 export class PostsService {
@@ -34,19 +35,8 @@ export class PostsService {
     ];
   }
 
-  public async createPost(@Body() dto: CreatePostDto) {
-    const metaOptions = dto.metaOptions
-      ? this.metaOptionsRepo.create(dto.metaOptions)
-      : null;
-
-    if (metaOptions) await this.metaOptionsRepo.save(metaOptions);
-
-    let newPost = this.postRepo.create({
-      ...dto,
-      metaOptions: metaOptions || undefined,
-    });
-
-    newPost = await this.postRepo.save(newPost);
-    return newPost;
+  public async createPost(dto: CreatePostDto) {
+    const newPost = this.postRepo.create(dto as DeepPartial<Post>);
+    return await this.postRepo.save(newPost);
   }
 }
