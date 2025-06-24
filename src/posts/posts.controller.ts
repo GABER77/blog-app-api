@@ -1,4 +1,14 @@
-import { Body, Controller, Get, Param, Patch, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  ParseUUIDPipe,
+  Patch,
+  Post,
+  Query,
+} from '@nestjs/common';
 import { PostsService } from './services/posts.service';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { CreatePostDto } from './dtos/create-post.dto';
@@ -36,5 +46,14 @@ export class PostsController {
   @Patch()
   public updatePost(@Body() updatePostDto: UpdatePostDto) {
     console.log(updatePostDto);
+  }
+
+  @Delete(':id')
+  public async deletePost(@Param('id', new ParseUUIDPipe()) id: string) {
+    await this.postsService.deletePost(id);
+    return {
+      message:
+        'Post and its related MetaOption have been deleted successfully.',
+    };
   }
 }
