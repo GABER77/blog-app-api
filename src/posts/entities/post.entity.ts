@@ -40,7 +40,6 @@ export class Post {
     cascade: true, // Automatically Creates MetaOption when a Post is created
     eager: true, // Automatically load MetaOption whenever a Post is fetched
   })
-  @JoinColumn({ name: 'metaOptionId' })
   metaOptions?: MetaOption;
 
   @CreateDateColumn()

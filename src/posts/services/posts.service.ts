@@ -30,17 +30,7 @@ export class PostsService {
   }
 
   public async deletePost(id: string) {
-    const post = await this.postRepo.findOne({
-      where: { id },
-      relations: ['metaOptions'], // this ensures metaOptions is loaded
-    });
-
-    if (!post) {
-      throw new NotFoundException('No post found with that ID');
-    }
     await this.postRepo.delete(id);
-
-    if (post.metaOptions) await this.metaOptionRepo.delete(post.metaOptions.id);
   }
 
   public async getPostByMetaOptionId(metaOptionId: string) {
