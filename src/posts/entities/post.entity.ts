@@ -36,7 +36,7 @@ export class Post {
   @Column({ type: 'simple-array', nullable: true })
   tags?: string[];
 
-  @OneToOne(() => MetaOption, {
+  @OneToOne(() => MetaOption, (metaOptions) => metaOptions.post, {
     cascade: true, // Automatically Creates MetaOption when a Post is created
     eager: true, // Automatically load MetaOption whenever a Post is fetched
   })

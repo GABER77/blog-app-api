@@ -42,4 +42,17 @@ export class PostsService {
 
     if (post.metaOptions) await this.metaOptionRepo.delete(post.metaOptions.id);
   }
+
+  public async getPostByMetaOptionId(metaOptionId: string) {
+    const meta = await this.metaOptionRepo.findOne({
+      where: { id: metaOptionId },
+      relations: ['post'],
+    });
+
+    if (!meta || !meta.post) {
+      throw new NotFoundException('Post not found for this MetaOption');
+    }
+
+    return meta.post;
+  }
 }

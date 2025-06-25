@@ -56,4 +56,12 @@ export class PostsController {
         'Post and its related MetaOption have been deleted successfully.',
     };
   }
+
+  // Get Post from MetaOption ID (based on bidirectional relation)
+  @Get(':metaOptionId/post')
+  public getPostByMetaOptionId(
+    @Param('metaOptionId', ParseUUIDPipe) metaOptionId: string,
+  ) {
+    return this.postsService.getPostByMetaOptionId(metaOptionId);
+  }
 }
