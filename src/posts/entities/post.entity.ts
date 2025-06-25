@@ -3,12 +3,14 @@ import {
   CreateDateColumn,
   Entity,
   JoinColumn,
+  ManyToOne,
   OneToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { postTypeEnum } from '../enums/postType.enum';
 import { postStatusEnum } from '../enums/postStatus.enum';
 import { MetaOption } from 'src/posts/entities/meta-option.entity';
+import { User } from 'src/users/user.entity';
 
 @Entity('posts')
 export class Post {
@@ -41,6 +43,13 @@ export class Post {
     eager: true, // Automatically load MetaOption whenever a Post is fetched
   })
   metaOptions?: MetaOption;
+
+  @ManyToOne(() => User, (user) => user.posts, {
+    onDelete: 'CASCADE',
+    eager: true,
+  })
+  @JoinColumn()
+  author: User;
 
   @CreateDateColumn()
   createdAt: Date;

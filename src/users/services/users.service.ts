@@ -54,11 +54,7 @@ export class UsersService {
   }
 
   /** Get single user from database by ID */
-  public getUser(id: string) {
-    return {
-      id: 123,
-      name: 'test1',
-      email: 'test1@test.com',
-    };
+  public async getUser(id: string) {
+    return await this.userRepo.findOneBy({ id });
   }
 }
