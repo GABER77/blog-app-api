@@ -32,7 +32,7 @@ export class PostsService {
 
     let tags: Tag[] = [];
     if (dto.tags?.length) {
-      tags = await this.tagsService.findOrCreateByNames(dto.tags);
+      tags = await this.tagsService.findTagsByNames(dto.tags);
     }
 
     const newPost = this.postRepo.create({

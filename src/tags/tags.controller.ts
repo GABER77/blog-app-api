@@ -1,18 +1,19 @@
 import { Controller, Get, Post, Body } from '@nestjs/common';
 import { TagsService } from './services/tags.service';
 import { Tag } from './tag.entity';
+import { CreateTagDto } from './dtos/create-tag.dto';
 
 @Controller('tags')
 export class TagsController {
   constructor(private readonly tagsService: TagsService) {}
 
   @Get()
-  async findAll(): Promise<Tag[]> {
-    return await this.tagsService.findAll();
+  async findAllTags(): Promise<Tag[]> {
+    return await this.tagsService.findAllTags();
   }
 
-  @Post('bulk')
-  async findOrCreateTags(@Body('names') names: string[]): Promise<Tag[]> {
-    return await this.tagsService.findOrCreateByNames(names);
+  @Post()
+  async createTags(@Body() createTagDto: CreateTagDto): Promise<Tag[]> {
+    return await this.tagsService.createTags(createTagDto);
   }
 }
