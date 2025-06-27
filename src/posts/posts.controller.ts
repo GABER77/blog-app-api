@@ -7,12 +7,12 @@ import {
   ParseUUIDPipe,
   Patch,
   Post,
-  Query,
 } from '@nestjs/common';
 import { PostsService } from './services/posts.service';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { CreatePostDto } from './dtos/create-post.dto';
 import { UpdatePostDto } from './dtos/update-post.dto';
+import { Post as PostEntity } from './entities/post.entity';
 
 @Controller('posts')
 @ApiTags('Posts')
@@ -43,9 +43,12 @@ export class PostsController {
     status: 200,
     description: 'You get 200 response if your post updated successfully',
   })
-  @Patch()
-  public updatePost(@Body() updatePostDto: UpdatePostDto) {
-    console.log(updatePostDto);
+  @Patch(':id')
+  public updatePost(
+    @Param('id') id: string,
+    @Body() dto: UpdatePostDto,
+  ): Promise<PostEntity> {
+    return this.postsService.updatePost(id, dto);
   }
 
   @Delete(':id')

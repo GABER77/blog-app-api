@@ -3,7 +3,6 @@ import {
   IsEnum,
   IsNotEmpty,
   IsOptional,
-  isString,
   IsString,
   IsUrl,
   Matches,

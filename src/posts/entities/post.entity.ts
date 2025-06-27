@@ -38,10 +38,7 @@ export class Post {
   @Column({ nullable: true })
   imageUrl?: string;
 
-  @ManyToMany(() => Tag, (tag) => tag.posts, {
-    cascade: true,
-    eager: true,
-  })
+  @ManyToMany(() => Tag, (tag) => tag.posts)
   @JoinTable()
   tags?: Tag[];
 
