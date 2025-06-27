@@ -5,7 +5,8 @@ import { Repository } from 'typeorm';
 import { Post } from '../entities/post.entity';
 import { CreatePostDto } from '../dtos/create-post.dto';
 import { MetaOption } from '../entities/meta-option.entity';
-import { privateDecrypt } from 'crypto';
+import { TagsService } from 'src/tags/services/tags.service';
+import { Tag } from 'src/tags/tag.entity';
 
 @Injectable()
 export class PostsService {
@@ -17,6 +18,7 @@ export class PostsService {
     private readonly metaOptionRepo: Repository<MetaOption>,
 
     private readonly usersService: UsersService,
+    private readonly tagsService: TagsService,
   ) {}
 
   public async getAllPosts(userId: string) {
@@ -26,12 +28,19 @@ export class PostsService {
 
   public async createPost(dto: CreatePostDto) {
     const author = await this.usersService.getUser(dto.authorId);
+    if (!author) throw new NotFoundException('User not found');
 
-    if (!author) {
-      throw new NotFoundException('User not found');
+    let tags: Tag[] = [];
+    if (dto.tags?.length) {
+      tags = await this.tagsService.findOrCreateByNames(dto.tags);
     }
 
-    const newPost = this.postRepo.create({ ...dto, author: author });
+    const newPost = this.postRepo.create({
+      ...dto,
+      author,
+      tags,
+    });
+
     return await this.postRepo.save(newPost);
   }
 

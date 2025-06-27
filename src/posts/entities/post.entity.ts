@@ -3,6 +3,8 @@ import {
   CreateDateColumn,
   Entity,
   JoinColumn,
+  JoinTable,
+  ManyToMany,
   ManyToOne,
   OneToOne,
   PrimaryGeneratedColumn,
@@ -11,6 +13,7 @@ import { postTypeEnum } from '../enums/postType.enum';
 import { postStatusEnum } from '../enums/postStatus.enum';
 import { MetaOption } from 'src/posts/entities/meta-option.entity';
 import { User } from 'src/users/user.entity';
+import { Tag } from 'src/tags/tag.entity';
 
 @Entity('posts')
 export class Post {
@@ -35,8 +38,12 @@ export class Post {
   @Column({ nullable: true })
   imageUrl?: string;
 
-  @Column({ type: 'simple-array', nullable: true })
-  tags?: string[];
+  @ManyToMany(() => Tag, (tag) => tag.posts, {
+    cascade: true,
+    eager: true,
+  })
+  @JoinTable()
+  tags?: Tag[];
 
   @OneToOne(() => MetaOption, (metaOptions) => metaOptions.post, {
     cascade: true, // Automatically Creates MetaOption when a Post is created
@@ -45,8 +52,8 @@ export class Post {
   metaOptions?: MetaOption;
 
   @ManyToOne(() => User, (user) => user.posts, {
-    onDelete: 'CASCADE',
-    eager: true,
+    onDelete: 'CASCADE', // Delete posts when user is deleted
+    eager: true, // Automatically load author whenever a Post is fetched
   })
   @JoinColumn()
   author: User;
