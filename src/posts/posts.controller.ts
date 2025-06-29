@@ -56,7 +56,7 @@ export class PostsController {
     await this.postsService.deletePost(id);
     return {
       message:
-        'Post and its related MetaOption have been deleted successfully.',
+        'Post and its related properties have been deleted successfully.',
     };
   }
 

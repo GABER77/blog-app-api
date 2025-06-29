@@ -1,6 +1,4 @@
-// src/tags/services/tags.service.ts
-
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Tag } from '../tag.entity';
@@ -50,5 +48,20 @@ export class TagsService {
 
     // Return only the newly created tags
     return createdTags;
+  }
+
+  public async deleteTag(id: string): Promise<{ message: string }> {
+    // Find the tag by ID
+    const tag = await this.tagRepo.findOne({ where: { id } });
+
+    // If not found, throw an exception
+    if (!tag) {
+      throw new NotFoundException(`Tag with ID '${id}' not found`);
+    }
+
+    // Remove the tag (this also cleans up the many-to-many join table)
+    await this.tagRepo.remove(tag);
+
+    return { message: `Tag '${tag.tag}' has been deleted successfully.` };
   }
 }

@@ -26,11 +26,7 @@ export class PostsService {
   ) {}
 
   public async getAllPosts(userId: string) {
-    const posts = await this.postRepo.find({
-      relations: {
-        tags: true, // Include tags in the result
-      },
-    });
+    const posts = await this.postRepo.find();
     return posts;
   }
 
@@ -38,6 +34,7 @@ export class PostsService {
     const author = await this.usersService.getUser(dto.authorId);
     if (!author) throw new NotFoundException('User not found');
 
+    // Get only tags that defined in the database
     let tags: Tag[] = [];
     if (dto.tags?.length) {
       tags = await this.tagsService.findTagsByNames(dto.tags);
@@ -70,10 +67,7 @@ export class PostsService {
   }
 
   public async updatePost(id: string, dto: UpdatePostDto): Promise<Post> {
-    const post = await this.postRepo.findOne({
-      where: { id },
-      relations: ['tags', 'metaOptions', 'author'],
-    });
+    const post = await this.postRepo.findOneBy({ id });
 
     if (!post) {
       throw new NotFoundException(`Post not found`);
