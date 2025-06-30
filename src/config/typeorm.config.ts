@@ -8,6 +8,6 @@ export const typeOrmConfig = (config: ConfigService): TypeOrmModuleOptions => ({
   username: config.get('DB_USERNAME'),
   password: config.get('DB_PASSWORD'),
   database: config.get('DB_NAME'),
-  autoLoadEntities: true,
-  synchronize: true, // ⚠️auto-creates tables in dev (DON'T USE IT IN PRODUCTION)
+  autoLoadEntities: config.get('DATABASE_AUTOLOAD') === 'true',
+  synchronize: config.get('DATABASE_SYNC') === 'true',
 });
