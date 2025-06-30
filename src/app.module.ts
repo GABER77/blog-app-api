@@ -8,20 +8,14 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TagsModule } from './tags/tags.module';
 import { typeOrmConfig } from './config/typeorm.config';
-
-// Ensure the application does not start without a valid NODE_ENV
-const allowedEnvs = ['development', 'production', 'test'];
-const nodeEnv = process.env.NODE_ENV;
-if (!nodeEnv || !allowedEnvs.includes(nodeEnv)) {
-  throw new Error('❌ NODE_ENV is not set to a valid enviroment.');
-}
-console.log(nodeEnv);
+import { envValidationSchema } from './config/env.validation';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true, // Load environment variables globally
-      envFilePath: `.env.${nodeEnv}`, // Load environment file that matching NODE_ENV
+      envFilePath: `.env.${process.env.NODE_ENV}`, // Load environment file that matching NODE_ENV
+      validationSchema: envValidationSchema, // Validate the environment variables at startup
     }),
 
     TypeOrmModule.forRootAsync({
