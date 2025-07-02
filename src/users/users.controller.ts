@@ -12,11 +12,11 @@ import {
   ParseUUIDPipe,
 } from '@nestjs/common';
 import { CreateUserDto } from './dtos/create-user.dto';
-import { GetUserParamDto } from './dtos/get-users-param.dto';
 import { PatchUserDto } from './dtos/patch-user.dto';
 import { UsersService } from './services/users.service';
 import { ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { User } from './user.entity';
+import { PaginationDto } from 'src/common/dto/pagination.dto';
 
 @Controller('users')
 @ApiTags('Users')
@@ -45,17 +45,13 @@ export class UsersController {
     description: 'The page number you want the results to be returned from',
     example: 2,
   })
-  public getUsers(
-    @Param() getUserParamDto: GetUserParamDto,
-    @Query('limit', new DefaultValuePipe(10), ParseIntPipe) limit: number,
-    @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number,
-  ) {
-    return this.usersService.getAllUsers(getUserParamDto, limit, page);
+  public getAllUsers(@Query() paginationDto: PaginationDto) {
+    return this.usersService.getAllUsers(paginationDto);
   }
 
   @Get(':id')
   async getUser(@Param('id', new ParseUUIDPipe()) id: string): Promise<User> {
-    return this.usersService.getUser(id);
+    return await this.usersService.getUser(id);
   }
 
   @Post()

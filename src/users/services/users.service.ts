@@ -5,12 +5,13 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { GetUserParamDto } from '../dtos/get-users-param.dto';
 import { AuthService } from 'src/auth/services/auth.service';
 import { Repository } from 'typeorm';
 import { User } from '../user.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CreateUserDto } from '../dtos/create-user.dto';
+import { getPaginationParams } from 'src/common/utils/pagination';
+import { PaginationDto } from 'src/common/dto/pagination.dto';
 
 @Injectable()
 export class UsersService {
@@ -39,15 +40,21 @@ export class UsersService {
     return await this.userRepo.save(newUser);
   }
 
-  public async getAllUsers(
-    getUserParamDto: GetUserParamDto,
-    limit: number,
-    page: number,
-  ) {
-    const isAuth = this.authService.isAuth();
-    console.log(isAuth);
+  public async getAllUsers(paginationDto: PaginationDto) {
+    const { limit, page } = paginationDto;
+    const { cappedLimit, skip } = getPaginationParams(limit, page);
 
-    return await this.userRepo.find();
+    const [users, total] = await this.userRepo.findAndCount({
+      take: cappedLimit,
+      skip,
+    });
+
+    return {
+      total,
+      retrieved: users.length,
+      page,
+      users,
+    };
   }
 
   public async getUser(id: string): Promise<User> {
