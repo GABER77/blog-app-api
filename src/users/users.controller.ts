@@ -9,12 +9,14 @@ import {
   DefaultValuePipe,
   BadRequestException,
   Patch,
+  ParseUUIDPipe,
 } from '@nestjs/common';
 import { CreateUserDto } from './dtos/create-user.dto';
 import { GetUserParamDto } from './dtos/get-users-param.dto';
 import { PatchUserDto } from './dtos/patch-user.dto';
 import { UsersService } from './services/users.service';
 import { ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { User } from './user.entity';
 
 @Controller('users')
 @ApiTags('Users')
@@ -24,7 +26,7 @@ export class UsersController {
     private readonly usersService: UsersService,
   ) {}
 
-  @Get('{/:id}')
+  @Get()
   @ApiOperation({
     summary: 'Get all users or a specific user when ID is given.',
   })
@@ -49,6 +51,11 @@ export class UsersController {
     @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number,
   ) {
     return this.usersService.getAllUsers(getUserParamDto, limit, page);
+  }
+
+  @Get(':id')
+  async getUser(@Param('id', new ParseUUIDPipe()) id: string): Promise<User> {
+    return this.usersService.getUser(id);
   }
 
   @Post()

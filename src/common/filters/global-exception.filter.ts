@@ -41,7 +41,7 @@ export class GlobalExceptionFilter implements ExceptionFilter {
       statusCode = HttpStatus.SERVICE_UNAVAILABLE; // 503
     }
 
-    // log all other uncaught errors too
+    // log uncaught errors
     this.logger.error(
       `Unhandled error on ${request.method} ${request.url}`,
       exception instanceof Error ? exception.stack : String(exception),

@@ -3,6 +3,7 @@ import {
   forwardRef,
   Inject,
   Injectable,
+  NotFoundException,
 } from '@nestjs/common';
 import { GetUserParamDto } from '../dtos/get-users-param.dto';
 import { AuthService } from 'src/auth/services/auth.service';
@@ -11,10 +12,8 @@ import { User } from '../user.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CreateUserDto } from '../dtos/create-user.dto';
 
-/** Class to connect to user table and perform business operations */
 @Injectable()
 export class UsersService {
-  /**Constructor to inject dependencies */
   constructor(
     // Injecting User Repository
     @InjectRepository(User)
@@ -40,8 +39,7 @@ export class UsersService {
     return await this.userRepo.save(newUser);
   }
 
-  /** Get all users from database */
-  public getAllUsers(
+  public async getAllUsers(
     getUserParamDto: GetUserParamDto,
     limit: number,
     page: number,
@@ -49,20 +47,16 @@ export class UsersService {
     const isAuth = this.authService.isAuth();
     console.log(isAuth);
 
-    return [
-      {
-        name: 'test1',
-        email: 'test1@test.com',
-      },
-      {
-        name: 'test2',
-        email: 'test2@test.com',
-      },
-    ];
+    return await this.userRepo.find();
   }
 
-  /** Get single user from database by ID */
-  public async getUser(id: string) {
-    return await this.userRepo.findOneBy({ id });
+  public async getUser(id: string): Promise<User> {
+    const user = await this.userRepo.findOneBy({ id });
+
+    if (!user) {
+      throw new NotFoundException(`User with ID '${id}' not found.`);
+    }
+
+    return user;
   }
 }
