@@ -1,4 +1,9 @@
-import { forwardRef, Inject, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  forwardRef,
+  Inject,
+  Injectable,
+} from '@nestjs/common';
 import { GetUserParamDto } from '../dtos/get-users-param.dto';
 import { AuthService } from 'src/auth/services/auth.service';
 import { Repository } from 'typeorm';
@@ -21,15 +26,18 @@ export class UsersService {
   ) {}
 
   public async createUser(dto: CreateUserDto) {
-    // Check if user already exist
-    const user = await this.userRepo.findOne({
+    // Check if user already exists
+    const existingUser = await this.userRepo.findOne({
       where: { email: dto.email },
     });
 
-    let newUser = this.userRepo.create(dto);
-    newUser = await this.userRepo.save(newUser);
+    if (existingUser) {
+      throw new BadRequestException('User with this email already exists.');
+    }
 
-    return newUser;
+    // Create and save new user
+    const newUser = this.userRepo.create(dto);
+    return await this.userRepo.save(newUser);
   }
 
   /** Get all users from database */

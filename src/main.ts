@@ -2,6 +2,7 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { GlobalExceptionFilter } from './common/filters/global-exception.filter';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -15,6 +16,10 @@ async function bootstrap() {
       transform: true, // transforms incoming request to match the DTO type
     }),
   );
+
+  // Global Exception Filter
+  // Handle DB related errors (e.g. failed .findOne, .save, .create, etc.)
+  app.useGlobalFilters(new GlobalExceptionFilter());
 
   // Swagger Configuration
   const config = new DocumentBuilder()
