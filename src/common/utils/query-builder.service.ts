@@ -32,6 +32,7 @@ export class QueryBuilderService {
         const opMap = { gte: '>=', gt: '>', lte: '<=', lt: '<' };
 
         // Add WHERE clause with operator (e.g. user.age >= 25)
+        // We want the result to be: ('user.age >= :age', { age: 30 })
         this.queryBuilder.andWhere(
           `${this.alias}.${key} ${opMap[operator]} :${key}`,
           {
@@ -47,5 +48,33 @@ export class QueryBuilderService {
     });
 
     return this; // Allows chaining
+  }
+
+  search(columns: string[]): this {
+    // Removes any extra spaces before or after the search string
+    const search = this.queryParams.search?.trim();
+
+    if (search) {
+      // Build a list of ILIKE conditions for each column
+      const searchConditions = columns.map((column, index) => {
+        // Create a unique parameter name for each column to avoid SQL conflicts
+        // Example: search0, search1
+        const paramName = `search${index}`;
+
+        // Set the parameter value for the query builder
+        // %ahmed% means: match anything that contains 'alex'
+        this.queryBuilder.setParameter(paramName, `%${search}%`);
+
+        // Return a condition like: user.name ILIKE :search0
+        // ILIKE is case-insensitive search operator
+        return `${this.alias}.${column} ILIKE :${paramName}`;
+      });
+
+      // Join all conditions with OR to build something like:
+      // WHERE (user.name ILIKE '%alex%' OR user.email ILIKE '%alex%')
+      this.queryBuilder.andWhere(`(${searchConditions.join(' OR ')})`);
+    }
+
+    return this;
   }
 }
