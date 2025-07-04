@@ -14,6 +14,9 @@ async function bootstrap() {
       forbidNonWhitelisted: true, // throws error if extra fields are present
       stopAtFirstError: true, // stops showing multiple errors per property
       transform: true, // transforms incoming request to match the DTO type
+      transformOptions: {
+        enableImplicitConversion: true, // Enable automatic type conversion for incoming request
+      },
     }),
   );
 

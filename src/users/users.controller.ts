@@ -5,8 +5,6 @@ import {
   Param,
   Query,
   Body,
-  ParseIntPipe,
-  DefaultValuePipe,
   BadRequestException,
   Patch,
   ParseUUIDPipe,
@@ -16,7 +14,7 @@ import { PatchUserDto } from './dtos/patch-user.dto';
 import { UsersService } from './services/users.service';
 import { ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { User } from './user.entity';
-import { PaginationDto } from 'src/common/dto/pagination.dto';
+import { QueryDto } from 'src/common/dto/query.dto';
 
 @Controller('users')
 @ApiTags('Users')
@@ -45,8 +43,8 @@ export class UsersController {
     description: 'The page number you want the results to be returned from',
     example: 2,
   })
-  public getAllUsers(@Query() paginationDto: PaginationDto) {
-    return this.usersService.getAllUsers(paginationDto);
+  public getAllUsers(@Query() queryDto: QueryDto) {
+    return this.usersService.getAllUsers(queryDto);
   }
 
   @Get(':id')
