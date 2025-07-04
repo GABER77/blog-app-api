@@ -1,3 +1,4 @@
+import { Type } from 'class-transformer';
 import {
   IsOptional,
   IsString,
@@ -5,12 +6,13 @@ import {
   Max,
   IsObject,
   ValidateNested,
+  Allow,
 } from 'class-validator';
 
-class FilterMap {
-  // accepts any additional fields for filtering (e.g. status, age)
-  [key: string]: any;
-}
+// class FilterMap {
+//   // accepts any additional fields for filtering (e.g. status, age)
+//   [key: string]: any;
+// }
 
 export class QueryDto {
   @IsOptional()
@@ -35,8 +37,13 @@ export class QueryDto {
   search?: string;
 
   // accepts any additional fields for filtering (e.g. status, age)
+  // @IsOptional()
+  // @IsObject()
+  // @ValidateNested()
+  // filters?: FilterMap;
+
   @IsOptional()
   @IsObject()
-  @ValidateNested()
-  filters?: FilterMap;
+  @Type(() => Object)
+  filters?: Record<string, string>;
 }

@@ -15,6 +15,7 @@ export class QueryBuilderService {
     // Copy query params and remove excluded fields
     const filters = { ...this.queryParams };
     excludedFields.forEach((field) => delete filters[field]);
+    console.log(filters);
 
     // Loop through each filter field
     Object.entries(filters).forEach(([key, value]) => {
@@ -117,7 +118,7 @@ export class QueryBuilderService {
 
   paginate(): this {
     // Calculate how many rows to skip based on current page and limit
-    const skip = (this.queryParams.page! - 1) * this.queryParams.limit!;
+    const skip = (1 - 1) * 5;
 
     this.queryBuilder.skip(skip).take(this.queryParams.limit);
     return this;

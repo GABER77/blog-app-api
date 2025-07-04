@@ -22,8 +22,8 @@ export class PostsController {
   constructor(private readonly postsService: PostsService) {}
 
   @Get()
-  public getAllPosts(@Query() queryDto: QueryDto) {
-    return this.postsService.getAllPosts(queryDto);
+  public getAllPosts(@Query() query: Record<string, any>) {
+    return this.postsService.getAllPosts(query);
   }
 
   @ApiOperation({
