@@ -41,6 +41,7 @@ export class QueryBuilderService {
         );
       } else {
         // If no operator, so basic filter (e.g. user.role = 'admin')
+        // We want the result to be: ('user.role = :role', { role: admin })
         this.queryBuilder.andWhere(`${this.alias}.${key} = :${key}`, {
           [key]: value,
         });
@@ -76,5 +77,53 @@ export class QueryBuilderService {
     }
 
     return this;
+  }
+
+  sort(): this {
+    const sort = this.queryParams.sort;
+
+    if (sort) {
+      // If multiple sort fields are passed, split them into an array
+      sort.split(',').forEach((field: string) => {
+        // Determine sort direction
+        const order = field.startsWith('-') ? 'DESC' : 'ASC';
+
+        // Remove the '-' if present to get the actual field name
+        const fieldName = field.replace('-', '');
+
+        // Result: user.createdAt DESC
+        this.queryBuilder.addOrderBy(`${this.alias}.${fieldName}`, order);
+      });
+    }
+
+    return this;
+  }
+
+  limitFields(): this {
+    const fields = this.queryParams.fields;
+
+    if (fields) {
+      const selectedFields = fields
+        .split(',')
+        .map((field: string) => `${this.alias}.${field.trim()}`);
+
+      this.queryBuilder.select(selectedFields);
+    }
+
+    return this;
+  }
+
+  paginate(): this {
+    const skip = (this.queryParams.page! - 1) * this.queryParams.limit!;
+
+    this.queryBuilder.skip(skip).take(this.queryParams.limit);
+    return this;
+  }
+
+  /**
+   * Returns the modified query builder so it can be executed.
+   */
+  getQuery(): SelectQueryBuilder<any> {
+    return this.queryBuilder;
   }
 }
