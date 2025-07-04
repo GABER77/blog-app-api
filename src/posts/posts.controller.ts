@@ -7,21 +7,23 @@ import {
   ParseUUIDPipe,
   Patch,
   Post,
+  Query,
 } from '@nestjs/common';
 import { PostsService } from './services/posts.service';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { CreatePostDto } from './dtos/create-post.dto';
 import { UpdatePostDto } from './dtos/update-post.dto';
 import { Post as PostEntity } from './entities/post.entity';
+import { QueryDto } from 'src/common/dto/query.dto';
 
 @Controller('posts')
 @ApiTags('Posts')
 export class PostsController {
   constructor(private readonly postsService: PostsService) {}
 
-  @Get('{/:id}')
-  public getPosts(@Param('id') userId: string) {
-    return this.postsService.getAllPosts(userId);
+  @Get()
+  public getAllPosts(@Query() queryDto: QueryDto) {
+    return this.postsService.getAllPosts(queryDto);
   }
 
   @ApiOperation({

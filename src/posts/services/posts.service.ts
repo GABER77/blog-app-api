@@ -8,6 +8,8 @@ import { MetaOption } from '../entities/meta-option.entity';
 import { TagsService } from 'src/tags/services/tags.service';
 import { Tag } from 'src/tags/tag.entity';
 import { UpdatePostDto } from '../dtos/update-post.dto';
+import { QueryDto } from 'src/common/dto/query.dto';
+import { QueryBuilderService } from 'src/common/utils/query-builder.service';
 
 @Injectable()
 export class PostsService {
@@ -25,9 +27,33 @@ export class PostsService {
     private readonly tagsService: TagsService,
   ) {}
 
-  public async getAllPosts(userId: string) {
-    const posts = await this.postRepo.find();
-    return posts;
+  public async getAllPosts(queryDto: QueryDto) {
+    // Create a query builder for the entity
+    const qb = this.postRepo.createQueryBuilder('post');
+
+    // Apply a chain of query features
+    const modifiedQuery = new QueryBuilderService(qb, queryDto, 'post')
+      .filter()
+      .search(['title', 'content']) // searchable fields
+      .sort()
+      .limitFields()
+      .paginate()
+      .getQuery();
+
+    // 'posts' Get paginated + filtered posts
+    // 'total' number of posts matching the filters (ignores pagination)
+    const [posts, total] = await modifiedQuery.getManyAndCount();
+
+    // Calculate the total number of pages based on total records
+    const totalPages = Math.ceil(total / queryDto.limit!);
+
+    return {
+      total,
+      retrieved: posts.length,
+      page: queryDto.page,
+      totalPages,
+      posts,
+    };
   }
 
   public async createPost(dto: CreatePostDto) {

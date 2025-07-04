@@ -41,13 +41,13 @@ export class UsersService {
   }
 
   public async getAllUsers(queryDto: QueryDto) {
-    // Create a query builder for the User entity
+    // Create a query builder for the entity
     const qb = this.userRepo.createQueryBuilder('user');
 
-    // Apply a chain of functionalities
+    // Apply a chain of query features
     const modifiedQuery = new QueryBuilderService(qb, queryDto, 'user')
       .filter()
-      .search(['name', 'email']) // Define searchable fields
+      .search(['name', 'email']) // searchable fields
       .sort()
       .limitFields()
       .paginate()

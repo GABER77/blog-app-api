@@ -1,4 +1,16 @@
-import { IsOptional, IsString, IsPositive, Max } from 'class-validator';
+import {
+  IsOptional,
+  IsString,
+  IsPositive,
+  Max,
+  IsObject,
+  ValidateNested,
+} from 'class-validator';
+
+class FilterMap {
+  // accepts any additional fields for filtering (e.g. status, age)
+  [key: string]: any;
+}
 
 export class QueryDto {
   @IsOptional()
@@ -21,4 +33,10 @@ export class QueryDto {
   @IsOptional()
   @IsString()
   search?: string;
+
+  // accepts any additional fields for filtering (e.g. status, age)
+  @IsOptional()
+  @IsObject()
+  @ValidateNested()
+  filters?: FilterMap;
 }
