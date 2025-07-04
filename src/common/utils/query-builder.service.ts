@@ -22,7 +22,7 @@ export class QueryBuilderService {
       if (typeof value != 'string') return;
 
       // Check if value contains a comparison operator (e.g. "gte=25")
-      const match = value.match(/(gte|gt|lte|lt)=(\d+)/);
+      const match = value.match(/(gte|gt|lte|lt)=(.+)/);
 
       if (match) {
         // `operator` = "gte", and `num` = "25" if value was "gte=25"
@@ -48,7 +48,7 @@ export class QueryBuilderService {
       }
     });
 
-    return this; // Allows chaining
+    return this;
   }
 
   search(columns: string[]): this {
@@ -66,8 +66,8 @@ export class QueryBuilderService {
         // %ahmed% means: match anything that contains 'alex'
         this.queryBuilder.setParameter(paramName, `%${search}%`);
 
-        // Return a condition like: user.name ILIKE :search0
         // ILIKE is case-insensitive search operator
+        // Return a condition like: user.name ILIKE :search0
         return `${this.alias}.${column} ILIKE :${paramName}`;
       });
 
@@ -103,10 +103,12 @@ export class QueryBuilderService {
     const fields = this.queryParams.fields;
 
     if (fields) {
+      // Split the fields by comma and trim spaces and prepend each one with alias (e.g. user.name)
       const selectedFields = fields
         .split(',')
         .map((field: string) => `${this.alias}.${field.trim()}`);
 
+      // e.g. selectedFields = ['user.name', 'user.email']
       this.queryBuilder.select(selectedFields);
     }
 
@@ -114,15 +116,14 @@ export class QueryBuilderService {
   }
 
   paginate(): this {
+    // Calculate how many rows to skip based on current page and limit
     const skip = (this.queryParams.page! - 1) * this.queryParams.limit!;
 
     this.queryBuilder.skip(skip).take(this.queryParams.limit);
     return this;
   }
 
-  /**
-   * Returns the modified query builder so it can be executed.
-   */
+  //Returns the modified query builder so it can be executed
   getQuery(): SelectQueryBuilder<any> {
     return this.queryBuilder;
   }
