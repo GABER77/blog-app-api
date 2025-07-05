@@ -37,8 +37,17 @@ export class GlobalExceptionFilter implements ExceptionFilter {
 
     // Handle TypeORM database errors
     if (exception instanceof QueryFailedError) {
-      message = 'Database operation failed. Please try again later.';
-      statusCode = HttpStatus.SERVICE_UNAVAILABLE; // 503
+      const errorMessage = (exception as QueryFailedError).message;
+
+      // Handle column not found error
+      if (errorMessage.includes('does not exist')) {
+        message =
+          'Invalid query parameter: one or more fields do not exist in the database.';
+        statusCode = HttpStatus.BAD_REQUEST; // 400
+      } else {
+        message = 'Database operation failed. Please try again later.';
+        statusCode = HttpStatus.SERVICE_UNAVAILABLE; // 503
+      }
     }
 
     // log uncaught errors
