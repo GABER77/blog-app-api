@@ -8,7 +8,7 @@ import { MetaOption } from '../entities/meta-option.entity';
 import { TagsService } from 'src/tags/services/tags.service';
 import { Tag } from 'src/tags/tag.entity';
 import { UpdatePostDto } from '../dtos/update-post.dto';
-import { QueryBuilderService } from 'src/common/utils/query-builder.service';
+import { HandlerFactory } from 'src/common/utils/handler-factory';
 
 @Injectable()
 export class PostsService {
@@ -27,36 +27,12 @@ export class PostsService {
   ) {}
 
   public async getAllPosts(query: Record<string, string>) {
-    // Parse pagination parameters with fallback
-    const page = Number(query.page) || 1;
-    const limit = Number(query.limit) || 10;
-
-    // Create a query builder for the entity
-    const qb = this.postRepo.createQueryBuilder('post');
-
-    // Apply a chain of query features
-    const modifiedQuery = new QueryBuilderService(qb, query, 'post')
-      .filter()
-      .search(['title', 'content']) // searchable fields
-      .sort()
-      .limitFields()
-      .paginate(page, limit)
-      .getQuery();
-
-    // 'posts' Get paginated + filtered posts
-    // 'total' number of posts matching the filters (ignores pagination)
-    const [posts, total] = await modifiedQuery.getManyAndCount();
-
-    // Calculate the total number of pages based on total records
-    const totalPages = Math.ceil(total / limit);
-
-    return {
-      total,
-      retrieved: posts.length,
-      page,
-      totalPages,
-      posts,
-    };
+    return HandlerFactory.getAll({
+      repo: this.postRepo,
+      queryParams: query,
+      alias: 'post',
+      searchableFields: ['title', 'content'],
+    });
   }
 
   public async createPost(dto: CreatePostDto) {

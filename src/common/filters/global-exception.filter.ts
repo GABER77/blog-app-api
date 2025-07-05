@@ -40,11 +40,15 @@ export class GlobalExceptionFilter implements ExceptionFilter {
       const errorMessage = (exception as QueryFailedError).message;
 
       // Handle column not found error
-      if (errorMessage.includes('does not exist')) {
+      if (
+        errorMessage.includes('does not exist') ||
+        errorMessage.includes('syntax error')
+      ) {
         message =
-          'Invalid query parameter: one or more fields do not exist in the database.';
+          'Invalid query parameter: one or more fields may not exist or are incorrectly formatted.';
         statusCode = HttpStatus.BAD_REQUEST; // 400
       } else {
+        // Fallback for other database related errors not covered above
         message = 'Database operation failed. Please try again later.';
         statusCode = HttpStatus.SERVICE_UNAVAILABLE; // 503
       }

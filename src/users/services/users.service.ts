@@ -10,7 +10,7 @@ import { Repository } from 'typeorm';
 import { User } from '../user.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CreateUserDto } from '../dtos/create-user.dto';
-import { QueryBuilderService } from 'src/common/utils/query-builder.service';
+import { HandlerFactory } from 'src/common/utils/handler-factory';
 
 @Injectable()
 export class UsersService {
@@ -40,36 +40,12 @@ export class UsersService {
   }
 
   public async getAllUsers(query: Record<string, string>) {
-    // Parse pagination parameters with fallback
-    const page = Number(query.page) || 1;
-    const limit = Number(query.limit) || 10;
-
-    // Create a query builder for the entity
-    const qb = this.userRepo.createQueryBuilder('user');
-
-    // Apply a chain of query features
-    const modifiedQuery = new QueryBuilderService(qb, query, 'user')
-      .filter()
-      .search(['name', 'email']) // searchable fields
-      .sort()
-      .limitFields()
-      .paginate(page, limit)
-      .getQuery();
-
-    // 'users' Get paginated + filtered users
-    // 'total' number of users matching the filters (ignores pagination)
-    const [users, total] = await modifiedQuery.getManyAndCount();
-
-    // Calculate the total number of pages based on total records
-    const totalPages = Math.ceil(total / limit);
-
-    return {
-      total,
-      retrieved: users.length,
-      page,
-      totalPages,
-      users,
-    };
+    return HandlerFactory.getAll({
+      repo: this.userRepo,
+      queryParams: query,
+      alias: 'user',
+      searchableFields: ['name', 'email'],
+    });
   }
 
   public async getUser(id: string): Promise<User> {
