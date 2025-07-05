@@ -14,7 +14,6 @@ import { PatchUserDto } from './dtos/patch-user.dto';
 import { UsersService } from './services/users.service';
 import { ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { User } from './user.entity';
-import { QueryDto } from 'src/common/dto/query.dto';
 
 @Controller('users')
 @ApiTags('Users')
@@ -43,8 +42,8 @@ export class UsersController {
     description: 'The page number you want the results to be returned from',
     example: 2,
   })
-  public getAllUsers(@Query() queryDto: QueryDto) {
-    return this.usersService.getAllUsers(queryDto);
+  public getAllUsers(@Query() query: Record<string, string>) {
+    return this.usersService.getAllUsers(query);
   }
 
   @Get(':id')

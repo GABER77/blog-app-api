@@ -11,7 +11,6 @@ import { User } from '../user.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CreateUserDto } from '../dtos/create-user.dto';
 import { QueryBuilderService } from 'src/common/utils/query-builder.service';
-import { QueryDto } from 'src/common/dto/query.dto';
 
 @Injectable()
 export class UsersService {
@@ -40,17 +39,21 @@ export class UsersService {
     return await this.userRepo.save(newUser);
   }
 
-  public async getAllUsers(queryDto: QueryDto) {
+  public async getAllUsers(query: Record<string, string>) {
+    // Parse pagination parameters with fallback
+    const page = Number(query.page) || 1;
+    const limit = Number(query.limit) || 10;
+
     // Create a query builder for the entity
     const qb = this.userRepo.createQueryBuilder('user');
 
     // Apply a chain of query features
-    const modifiedQuery = new QueryBuilderService(qb, queryDto, 'user')
+    const modifiedQuery = new QueryBuilderService(qb, query, 'user')
       .filter()
       .search(['name', 'email']) // searchable fields
       .sort()
       .limitFields()
-      .paginate()
+      .paginate(page, limit)
       .getQuery();
 
     // 'users' Get paginated + filtered users
@@ -58,12 +61,12 @@ export class UsersService {
     const [users, total] = await modifiedQuery.getManyAndCount();
 
     // Calculate the total number of pages based on total records
-    const totalPages = Math.ceil(total / queryDto.limit!);
+    const totalPages = Math.ceil(total / limit);
 
     return {
       total,
       retrieved: users.length,
-      page: queryDto.page,
+      page,
       totalPages,
       users,
     };

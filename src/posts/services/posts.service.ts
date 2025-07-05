@@ -8,7 +8,6 @@ import { MetaOption } from '../entities/meta-option.entity';
 import { TagsService } from 'src/tags/services/tags.service';
 import { Tag } from 'src/tags/tag.entity';
 import { UpdatePostDto } from '../dtos/update-post.dto';
-import { QueryDto } from 'src/common/dto/query.dto';
 import { QueryBuilderService } from 'src/common/utils/query-builder.service';
 
 @Injectable()
@@ -27,17 +26,21 @@ export class PostsService {
     private readonly tagsService: TagsService,
   ) {}
 
-  public async getAllPosts(queryDto: QueryDto) {
+  public async getAllPosts(query: Record<string, string>) {
+    // Parse pagination parameters with fallback
+    const page = Number(query.page) || 1;
+    const limit = Number(query.limit) || 10;
+
     // Create a query builder for the entity
     const qb = this.postRepo.createQueryBuilder('post');
 
     // Apply a chain of query features
-    const modifiedQuery = new QueryBuilderService(qb, queryDto, 'post')
+    const modifiedQuery = new QueryBuilderService(qb, query, 'post')
       .filter()
       .search(['title', 'content']) // searchable fields
       .sort()
       .limitFields()
-      .paginate()
+      .paginate(page, limit)
       .getQuery();
 
     // 'posts' Get paginated + filtered posts
@@ -45,12 +48,12 @@ export class PostsService {
     const [posts, total] = await modifiedQuery.getManyAndCount();
 
     // Calculate the total number of pages based on total records
-    const totalPages = Math.ceil(total / queryDto.limit!);
+    const totalPages = Math.ceil(total / limit);
 
     return {
       total,
       retrieved: posts.length,
-      page: queryDto.page,
+      page,
       totalPages,
       posts,
     };

@@ -1,10 +1,9 @@
 import { SelectQueryBuilder } from 'typeorm';
-import { QueryDto } from '../dto/query.dto';
 
 export class QueryBuilderService {
   constructor(
     private queryBuilder: SelectQueryBuilder<any>,
-    private queryParams: QueryDto, // This contains all the incoming query parameters
+    private queryParams: Record<string, string>, // This contains all the incoming query parameters
     private alias: string, // Alias is a temporary name used to refer to the table, like 'user' or 'post'
   ) {}
 
@@ -15,7 +14,6 @@ export class QueryBuilderService {
     // Copy query params and remove excluded fields
     const filters = { ...this.queryParams };
     excludedFields.forEach((field) => delete filters[field]);
-    console.log(filters);
 
     // Loop through each filter field
     Object.entries(filters).forEach(([key, value]) => {
@@ -42,9 +40,14 @@ export class QueryBuilderService {
         );
       } else {
         // If no operator, so basic filter (e.g. user.role = 'admin')
+        // Normalize value: convert "true"/"false" strings to actual booleans
+        let normalizedValue: string | boolean = value;
+        if (value === 'true') normalizedValue = true;
+        else if (value === 'false') normalizedValue = false;
+
         // We want the result to be: ('user.role = :role', { role: admin })
         this.queryBuilder.andWhere(`${this.alias}.${key} = :${key}`, {
-          [key]: value,
+          [key]: normalizedValue,
         });
       }
     });
@@ -116,11 +119,11 @@ export class QueryBuilderService {
     return this;
   }
 
-  paginate(): this {
+  paginate(page: number, limit: number): this {
     // Calculate how many rows to skip based on current page and limit
-    const skip = (1 - 1) * 5;
+    const skip = (page - 1) * limit;
 
-    this.queryBuilder.skip(skip).take(this.queryParams.limit);
+    this.queryBuilder.skip(skip).take(limit);
     return this;
   }
 

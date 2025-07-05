@@ -14,7 +14,6 @@ import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { CreatePostDto } from './dtos/create-post.dto';
 import { UpdatePostDto } from './dtos/update-post.dto';
 import { Post as PostEntity } from './entities/post.entity';
-import { QueryDto } from 'src/common/dto/query.dto';
 
 @Controller('posts')
 @ApiTags('Posts')
@@ -22,7 +21,7 @@ export class PostsController {
   constructor(private readonly postsService: PostsService) {}
 
   @Get()
-  public getAllPosts(@Query() query: Record<string, any>) {
+  public getAllPosts(@Query() query: Record<string, string>) {
     return this.postsService.getAllPosts(query);
   }
 
