@@ -7,6 +7,14 @@ import { GlobalExceptionFilter } from './common/filters/global-exception.filter'
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
+  // Allow requests from other domains (Cross-Origin Resource Sharing)
+  app.enableCors({
+    origin: ['http://localhost:3000'], // Frontend origin
+    methods: ['GET', 'POST', 'PATCH', 'DELETE'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+    credentials: true, // // enable cookies and JWTs with credentials
+  });
+
   // Enable global validation pipe with strict rules
   app.useGlobalPipes(
     new ValidationPipe({
