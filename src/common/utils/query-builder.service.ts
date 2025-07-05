@@ -20,22 +20,21 @@ export class QueryBuilderService {
       //Skip non-string values (e.g. ?tags[]=node)
       if (typeof value != 'string') return;
 
-      // Check if value contains a comparison operator (e.g. "gte=25")
-      const match = value.match(/(gte|gt|lte|lt)=(.+)/);
+      // Check if the key contains a comparison operator (e.g. "age[gte]=18")
+      const match = key.match(/^(\w+)\[(gte|gt|lte|lt)\]$/);
 
       if (match) {
-        // `operator` = "gte", and `num` = "25" if value was "gte=25"
-        // ',' To skips the first item "gte=25"
-        const [, operator, num] = match;
+        // `field` = "age", and `operator` = "gte" if value was "age[gte]=18"
+        // ',' To skips the first item "age[gte]"
+        const [, field, operator] = match;
         // Convert operator names to actual SQL syntax
         const opMap = { gte: '>=', gt: '>', lte: '<=', lt: '<' };
 
-        // Add WHERE clause with operator (e.g. user.age >= 25)
-        // We want the result to be: ('user.age >= :age', { age: 30 })
+        // We want the result to be: ('user.age >= :age', { age: 18 })
         this.queryBuilder.andWhere(
-          `${this.alias}.${key} ${opMap[operator]} :${key}`,
+          `${this.alias}.${field} ${opMap[operator]} :${field}`,
           {
-            [key]: Number(num),
+            [field]: Number(value),
           },
         );
       } else {
