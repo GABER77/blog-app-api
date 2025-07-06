@@ -1,24 +1,20 @@
 import {
   Controller,
   Get,
-  Post,
   Param,
   Query,
   Body,
-  BadRequestException,
   Patch,
   ParseUUIDPipe,
 } from '@nestjs/common';
-import { CreateUserDto } from '../auth/dto/create-user.dto';
-import { PatchUserDto } from './dto/patch-user.dto';
+import { UpdateUserDto } from './dto/update-user.dto';
 import { UserService } from './services/user.service';
 import { ApiTags } from '@nestjs/swagger';
 import { User } from './user.entity';
 import {
-  SwaggerCreateUser,
   SwaggerGetAllUsers,
   SwaggerGetUser,
-  SwaggerPatchUser,
+  SwaggerUpdateUser,
 } from 'src/common/swagger/users.swagger';
 
 @Controller('users')
@@ -38,22 +34,12 @@ export class UserController {
     return await this.userService.getUserById(id);
   }
 
-  @Post()
-  @SwaggerCreateUser()
-  public CreateUser(@Body() createUserDto: CreateUserDto) {
-    const { password, passwordConfirm } = createUserDto;
-
-    // Ensure that password and passwordConfirm match
-    if (password !== passwordConfirm) {
-      throw new BadRequestException('Passwords do not match.');
-    }
-
-    return this.userService.createUser(createUserDto);
+  @Patch(':id')
+  @SwaggerUpdateUser()
+  public updateUser(
+    @Param('id', new ParseUUIDPipe()) id: string,
+    @Body() updateUserDto: UpdateUserDto,
+  ) {
+    return this.userService.updateUser(id, updateUserDto);
   }
-
-  // @Patch()
-  // @SwaggerPatchUser()
-  // public patchUsers(@Body() patchUserDto: PatchUserDto) {
-  //   return patchUserDto;
-  // }
 }

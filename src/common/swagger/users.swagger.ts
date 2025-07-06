@@ -6,8 +6,7 @@ import {
   ApiBody,
   ApiParam,
 } from '@nestjs/swagger';
-import { CreateUserDto } from '../../auth/dto/create-user.dto';
-import { PatchUserDto } from '../../users/dto/patch-user.dto';
+import { UpdateUserDto } from '../../users/dto/update-user.dto';
 import { User } from '../../users/user.entity';
 
 export const SwaggerGetAllUsers = () =>
@@ -65,27 +64,28 @@ export const SwaggerGetUser = () =>
   applyDecorators(
     ApiOperation({ summary: 'Get a specific user by ID.' }),
     ApiResponse({ status: 200, type: User }),
-    ApiParam({ name: 'id', type: 'string', description: 'UUID of the user.' }),
-  );
-
-export const SwaggerCreateUser = () =>
-  applyDecorators(
-    ApiOperation({ summary: 'Create a new user.' }),
-    ApiResponse({
-      status: 201,
-      description: 'User created successfully.',
-      type: User,
+    ApiParam({
+      name: 'id',
+      type: 'string',
+      description: 'UUID of the user.',
+      example: '049076d2-fc27-48bb-9d07-6f21fa4f6345',
     }),
-    ApiBody({ type: CreateUserDto }),
   );
 
-export const SwaggerPatchUser = () =>
+export const SwaggerUpdateUser = () =>
   applyDecorators(
-    ApiOperation({ summary: 'Patch (partially update) user fields.' }),
+    ApiOperation({ summary: 'Update user fields (excluding password)' }),
+    ApiParam({
+      name: 'id',
+      type: 'string',
+      description: 'UUID of the user to update',
+      example: '049076d2-fc27-48bb-9d07-6f21fa4f6345',
+    }),
+    ApiBody({ type: UpdateUserDto }),
     ApiResponse({
       status: 200,
-      description: 'User patched successfully.',
+      description: 'User updated successfully',
       type: User,
     }),
-    ApiBody({ type: PatchUserDto }),
+    ApiResponse({ status: 404, description: 'User not found' }),
   );
