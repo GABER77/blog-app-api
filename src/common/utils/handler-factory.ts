@@ -33,15 +33,15 @@ export class HandlerFactory {
 
     // 'results' Get paginated + filtered results
     // 'total' number of documents matching the filters (ignores pagination)
-    const [results, total] = await modifiedQuery.getManyAndCount();
+    const [results, totalItems] = await modifiedQuery.getManyAndCount();
 
     // Calculate the total number of pages based on total records
-    const totalPages = Math.ceil(total / limit);
+    const totalPages = Math.ceil(totalItems / limit);
 
     return {
-      total,
-      retrieved: results.length,
-      page,
+      totalItems,
+      itemsPerPage: results.length,
+      currentPage: page,
       totalPages,
       data: results,
     };

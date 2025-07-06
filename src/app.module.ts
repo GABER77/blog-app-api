@@ -1,12 +1,12 @@
 import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { UsersModule } from 'src/users/users.module';
-import { PostsModule } from './posts/posts.module';
+import { UserModule } from 'src/users/user.module';
+import { PostModule } from './posts/post.module';
 import { AuthModule } from './auth/auth.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { TagsModule } from './tags/tags.module';
+import { TagModule } from './tags/tag.module';
 import { typeOrmConfig } from './config/typeorm.config';
 import { envValidationSchema } from './config/env.validation';
 
@@ -23,10 +23,10 @@ import { envValidationSchema } from './config/env.validation';
       inject: [ConfigService], // Inject ConfigService to read .env values
       useFactory: typeOrmConfig,
     }),
-    UsersModule,
-    PostsModule,
+    UserModule,
+    PostModule,
     AuthModule,
-    TagsModule,
+    TagModule,
   ],
   controllers: [AppController],
   providers: [AppService],

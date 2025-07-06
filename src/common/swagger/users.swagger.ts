@@ -6,8 +6,8 @@ import {
   ApiBody,
   ApiParam,
 } from '@nestjs/swagger';
-import { CreateUserDto } from '../../users/dtos/create-user.dto';
-import { PatchUserDto } from '../../users/dtos/patch-user.dto';
+import { CreateUserDto } from '../../auth/dto/create-user.dto';
+import { PatchUserDto } from '../../users/dto/patch-user.dto';
 import { User } from '../../users/user.entity';
 
 export const SwaggerGetAllUsers = () =>

@@ -7,26 +7,26 @@ import {
   Param,
   ParseUUIDPipe,
 } from '@nestjs/common';
-import { TagsService } from './services/tags.service';
+import { TagService } from './services/tag.service';
 import { Tag } from './tag.entity';
-import { CreateTagDto } from './dtos/create-tag.dto';
+import { CreateTagDto } from './dto/create-tag.dto';
 
 @Controller('tags')
-export class TagsController {
-  constructor(private readonly tagsService: TagsService) {}
+export class TagController {
+  constructor(private readonly tagService: TagService) {}
 
   @Get()
   async findAllTags(): Promise<Tag[]> {
-    return await this.tagsService.findAllTags();
+    return await this.tagService.findAllTags();
   }
 
   @Post()
   async createTags(@Body() createTagDto: CreateTagDto): Promise<Tag[]> {
-    return await this.tagsService.createTags(createTagDto);
+    return await this.tagService.createTags(createTagDto);
   }
 
   @Delete(':id')
   async deleteTag(@Param('id', new ParseUUIDPipe()) id: string) {
-    return await this.tagsService.deleteTag(id);
+    return await this.tagService.deleteTag(id);
   }
 }

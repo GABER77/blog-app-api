@@ -1,17 +1,17 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { UsersService } from 'src/users/services/users.service';
+import { UserService } from 'src/users/services/user.service';
 import { In, Repository } from 'typeorm';
 import { Post } from '../entities/post.entity';
-import { CreatePostDto } from '../dtos/create-post.dto';
+import { CreatePostDto } from '../dto/create-post.dto';
 import { MetaOption } from '../entities/meta-option.entity';
-import { TagsService } from 'src/tags/services/tags.service';
+import { TagService } from 'src/tags/services/tag.service';
 import { Tag } from 'src/tags/tag.entity';
-import { UpdatePostDto } from '../dtos/update-post.dto';
+import { UpdatePostDto } from '../dto/update-post.dto';
 import { HandlerFactory } from 'src/common/utils/handler-factory';
 
 @Injectable()
-export class PostsService {
+export class PostService {
   constructor(
     @InjectRepository(Post)
     private readonly postRepo: Repository<Post>,
@@ -22,8 +22,8 @@ export class PostsService {
     @InjectRepository(Tag)
     private readonly tagRepo: Repository<Tag>,
 
-    private readonly usersService: UsersService,
-    private readonly tagsService: TagsService,
+    private readonly userService: UserService,
+    private readonly tagService: TagService,
   ) {}
 
   public async getAllPosts(query: Record<string, string>) {
@@ -36,13 +36,13 @@ export class PostsService {
   }
 
   public async createPost(dto: CreatePostDto) {
-    const author = await this.usersService.getUser(dto.authorId);
+    const author = await this.userService.getUserById(dto.authorId);
     if (!author) throw new NotFoundException('User not found');
 
     // Get only tags that defined in the database
     let tags: Tag[] = [];
     if (dto.tags?.length) {
-      tags = await this.tagsService.findTagsByNames(dto.tags);
+      tags = await this.tagService.findTagsByNames(dto.tags);
     }
 
     const newPost = this.postRepo.create({

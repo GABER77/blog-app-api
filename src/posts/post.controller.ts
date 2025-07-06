@@ -9,20 +9,20 @@ import {
   Post,
   Query,
 } from '@nestjs/common';
-import { PostsService } from './services/posts.service';
+import { PostService } from './services/post.service';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { CreatePostDto } from './dtos/create-post.dto';
-import { UpdatePostDto } from './dtos/update-post.dto';
+import { CreatePostDto } from './dto/create-post.dto';
+import { UpdatePostDto } from './dto/update-post.dto';
 import { Post as PostEntity } from './entities/post.entity';
 
 @Controller('posts')
 @ApiTags('Posts')
-export class PostsController {
-  constructor(private readonly postsService: PostsService) {}
+export class PostController {
+  constructor(private readonly postService: PostService) {}
 
   @Get()
   public getAllPosts(@Query() query: Record<string, string>) {
-    return this.postsService.getAllPosts(query);
+    return this.postService.getAllPosts(query);
   }
 
   @ApiOperation({
@@ -34,7 +34,7 @@ export class PostsController {
   })
   @Post()
   public createPost(@Body() createPostDto: CreatePostDto) {
-    return this.postsService.createPost(createPostDto);
+    return this.postService.createPost(createPostDto);
   }
 
   @ApiOperation({
@@ -49,12 +49,12 @@ export class PostsController {
     @Param('id') id: string,
     @Body() dto: UpdatePostDto,
   ): Promise<PostEntity> {
-    return this.postsService.updatePost(id, dto);
+    return this.postService.updatePost(id, dto);
   }
 
   @Delete(':id')
   public async deletePost(@Param('id', new ParseUUIDPipe()) id: string) {
-    await this.postsService.deletePost(id);
+    await this.postService.deletePost(id);
     return {
       message:
         'Post and its related properties have been deleted successfully.',
@@ -66,6 +66,6 @@ export class PostsController {
   public getPostByMetaOptionId(
     @Param('metaOptionId', ParseUUIDPipe) metaOptionId: string,
   ) {
-    return this.postsService.getPostByMetaOptionId(metaOptionId);
+    return this.postService.getPostByMetaOptionId(metaOptionId);
   }
 }
