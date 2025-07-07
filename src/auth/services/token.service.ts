@@ -24,7 +24,7 @@ export class TokenService {
     };
 
     return {
-      name: 'JWT',
+      name: 'jwt',
       value: token,
       options: cookieOptions,
     };
