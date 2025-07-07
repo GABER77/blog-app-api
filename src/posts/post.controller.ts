@@ -8,6 +8,7 @@ import {
   Patch,
   Post,
   Query,
+  UseGuards,
 } from '@nestjs/common';
 import { PostService } from './services/post.service';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';

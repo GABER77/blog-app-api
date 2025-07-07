@@ -9,6 +9,8 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TagModule } from './tags/tag.module';
 import { typeOrmConfig } from './config/typeorm.config';
 import { envValidationSchema } from './config/env.validation';
+import { APP_GUARD } from '@nestjs/core';
+import { ProtectGuard } from './auth/guards/protect.guard';
 
 @Module({
   imports: [
@@ -29,6 +31,13 @@ import { envValidationSchema } from './config/env.validation';
     TagModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [
+    AppService,
+    {
+      // Apply ProtectGuard globally across the entire application
+      provide: APP_GUARD,
+      useClass: ProtectGuard,
+    },
+  ],
 })
 export class AppModule {}

@@ -46,11 +46,13 @@ export class ProtectGuard implements CanActivate {
     // 2) Verify the token using the secret from environment
     let decoded: { id: string; iat: number; exp: number };
     try {
-      decoded = this.jwtService.verify(token, {
+      decoded = await this.jwtService.verifyAsync(token, {
         secret: process.env.JWT_SECRET,
       });
     } catch {
-      throw new UnauthorizedException('Token is invalid or expired.');
+      throw new UnauthorizedException(
+        'Token is invalid or expired. Please log in again.',
+      );
     }
 
     // 3) Check if user still exists: Maybe he deleted his account
@@ -70,8 +72,12 @@ export class ProtectGuard implements CanActivate {
       );
     }
 
+    // Exclude the hashed password from the returned response
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { password, ...safeUser } = user;
+
     // All checks passed. Attach user to request for downstream access
-    request['user'] = user;
+    request['user'] = safeUser;
 
     // Allow the request to proceed to the controller
     return true;

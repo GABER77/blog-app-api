@@ -40,8 +40,8 @@ export class AuthService {
 
     // Exclude the hashed password from the returned response
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { password, ...result } = user;
-    return result;
+    const { password, ...safeUser } = user;
+    return safeUser;
   }
 
   async login(loginDto: LoginDto): Promise<{

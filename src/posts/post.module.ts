@@ -6,6 +6,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { Post } from './entities/post.entity';
 import { MetaOption } from 'src/posts/entities/meta-option.entity';
 import { TagModule } from 'src/tags/tag.module';
+import { AuthModule } from 'src/auth/auth.module';
 
 @Module({
   controllers: [PostController],
@@ -13,6 +14,7 @@ import { TagModule } from 'src/tags/tag.module';
   imports: [
     UserModule,
     TagModule,
+    AuthModule,
     TypeOrmModule.forFeature([Post, MetaOption]),
   ],
 })
