@@ -6,16 +6,6 @@ import { CookieOptions } from 'express';
 export class TokenService {
   constructor(private readonly jwtService: JwtService) {}
 
-  createToken(userId: string): Promise<string> {
-    return this.jwtService.signAsync(
-      { sub: userId },
-      {
-        secret: process.env.JWT_SECRET,
-        expiresIn: process.env.JWT_EXPIRES_IN,
-      },
-    );
-  }
-
   async createCookie(userId: string): Promise<{
     name: string;
     value: string;
@@ -38,5 +28,15 @@ export class TokenService {
       value: token,
       options: cookieOptions,
     };
+  }
+
+  createToken(userId: string): Promise<string> {
+    return this.jwtService.signAsync(
+      { sub: userId },
+      {
+        secret: process.env.JWT_SECRET,
+        expiresIn: process.env.JWT_EXPIRES_IN,
+      },
+    );
   }
 }
