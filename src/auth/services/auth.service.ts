@@ -10,6 +10,7 @@ import { CreateUserDto } from '../dto/create-user.dto';
 import { User } from '../../users/user.entity';
 import { LoginDto } from '../dto/login.dto';
 import { TokenService } from './token.service';
+import { CookieOptions } from 'express';
 
 @Injectable()
 export class AuthService {
@@ -43,7 +44,10 @@ export class AuthService {
     return result;
   }
 
-  async login(loginDto: LoginDto): Promise<{ token: string } | null> {
+  async login(loginDto: LoginDto): Promise<{
+    cookie: { name: string; value: string; options: CookieOptions };
+    user: Omit<User, 'password'>;
+  } | null> {
     // Check if a user with this email already exists
     const user = await this.userService.getUserByEmail(loginDto.email);
     if (!user) return null;
@@ -57,9 +61,13 @@ export class AuthService {
     // If the password does not match, return null (invalid credentials)
     if (!isPasswordMatch) return null;
 
-    // Create token
-    const token = await this.tokenService.sign(user.id);
+    // Create secure JWT cookie
+    const cookie = await this.tokenService.createCookie(user.id);
 
-    return { token };
+    // Exclude the hashed password from the returned response
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { password, ...safeUser } = user;
+
+    return { cookie, user: safeUser };
   }
 }
