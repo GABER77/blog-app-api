@@ -1,5 +1,6 @@
 import { Post } from 'src/posts/entities/post.entity';
 import {
+  BeforeInsert,
   Column,
   CreateDateColumn,
   Entity,
@@ -27,6 +28,14 @@ export class User {
   @CreateDateColumn()
   createdAt: Date;
 
+  @Column({ type: 'timestamp', nullable: true })
+  passwordChangedAt: Date;
+
   @OneToMany(() => Post, (post) => post.author)
   posts: Post[];
+
+  @BeforeInsert() // It runs automatically before the entity is first inserted into the database
+  protected setPasswordChangedAt() {
+    this.passwordChangedAt = new Date();
+  }
 }
