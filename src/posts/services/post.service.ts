@@ -35,8 +35,8 @@ export class PostService {
     });
   }
 
-  public async createPost(dto: CreatePostDto) {
-    const author = await this.userService.getUserById(dto.authorId);
+  public async createPost(dto: CreatePostDto, userId: string) {
+    const author = await this.userService.getUserById(userId);
     if (!author) throw new NotFoundException('User not found');
 
     // Get only tags that defined in the database

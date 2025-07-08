@@ -93,7 +93,4 @@ export class CreatePostDto {
   // Convert each item to class instance so nested validation works
   @Type(() => CreatePostMetaOptonsDto)
   metaOptions?: CreatePostMetaOptonsDto;
-
-  @IsString()
-  authorId: string;
 }
