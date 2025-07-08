@@ -4,9 +4,11 @@ import {
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
+import { Reflector } from '@nestjs/core';
 import { JwtService } from '@nestjs/jwt';
 import { UserService } from 'src/users/services/user.service';
 import { Request } from 'express';
+import { IS_PUBLIC_KEY } from '../decorators/public.decorator';
 
 // Extend the Request to include cookies (because Express.Request doesn't have it by default)
 interface RequestWithCookies extends Request {
@@ -18,8 +20,12 @@ export class ProtectGuard implements CanActivate {
   constructor(
     private readonly jwtService: JwtService,
     private readonly userService: UserService,
+    private readonly reflector: Reflector,
   ) {}
   async canActivate(context: ExecutionContext): Promise<boolean> {
+    // Check if this route is marked public, skip guard if true
+    if (this.isPublicRoute(context)) return true;
+
     // Extract the incoming HTTP request from the context
     const request = context.switchToHttp().getRequest<RequestWithCookies>();
 
@@ -81,5 +87,16 @@ export class ProtectGuard implements CanActivate {
 
     // Allow the request to proceed to the controller
     return true;
+  }
+
+  // Checking @Public() metadata
+  private isPublicRoute(context: ExecutionContext): boolean {
+    return (
+      this.reflector.getAllAndOverride<boolean>(IS_PUBLIC_KEY, [
+        // Priority order: first check the route handler, then the class
+        context.getHandler(), // Gets the method from the controller (e.g., signup())
+        context.getClass(), // Gets the controller class itself (e.g., UserController)
+      ]) === true
+    );
   }
 }
