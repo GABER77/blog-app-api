@@ -13,7 +13,7 @@ export class TokenService {
   constructor(private readonly jwtService: JwtService) {}
 
   // Create both tokens and return with cookies
-  async generateTokenCookies(userId: string): Promise<{
+  async generateTokensCookies(userId: string): Promise<{
     accessTokenCookie: { name: string; value: string; options: CookieOptions };
     refreshTokenCookie: { name: string; value: string; options: CookieOptions };
   }> {

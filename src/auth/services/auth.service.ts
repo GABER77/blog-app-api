@@ -81,7 +81,7 @@ export class AuthService {
     if (!isPasswordMatch) return null;
 
     // Create access token and refresh token
-    const cookies = await this.tokenService.generateTokenCookies(user.id);
+    const cookies = await this.tokenService.generateTokensCookies(user.id);
 
     // Exclude the hashed password from the returned response
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
