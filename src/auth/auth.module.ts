@@ -9,7 +9,7 @@ import { JwtModule } from '@nestjs/jwt';
 @Module({
   controllers: [AuthController],
   providers: [AuthService, HashService, TokenService],
-  exports: [AuthService, JwtModule],
+  exports: [AuthService, JwtModule, TokenService],
   imports: [forwardRef(() => UserModule), JwtModule],
 })
 export class AuthModule {}

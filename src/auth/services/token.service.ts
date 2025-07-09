@@ -23,7 +23,7 @@ export class TokenService {
     const accessTokenCookieOptions: CookieOptions = {
       httpOnly: true,
       expires: new Date(
-        Date.now() + Number(process.env.JWT_COOKIE_EXPIRES_IN) * 60 * 60 * 1000,
+        Date.now() + Number(process.env.JWT_COOKIE_EXPIRES_IN) * 60 * 1000,
       ), // Remove the cookie from the browser after this time
       sameSite: 'lax', // Limits cookie to same-site requests for CSRF protection
       secure: process.env.NODE_ENV === 'production', // Only send cookie over HTTPS in production
@@ -77,6 +77,18 @@ export class TokenService {
         expiresIn: process.env.JWT_REFRESH_EXPIRES_IN,
       },
     );
+  }
+
+  // Verify Access Token
+  async verifyAccessToken(token: string): Promise<JwtPayload> {
+    try {
+      const decoded = await this.jwtService.verifyAsync<JwtPayload>(token, {
+        secret: process.env.JWT_SECRET,
+      });
+      return decoded;
+    } catch {
+      throw new UnauthorizedException('Invalid or expired access token');
+    }
   }
 
   // Verify Refresh Token

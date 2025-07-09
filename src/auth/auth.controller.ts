@@ -1,9 +1,11 @@
 import {
   Body,
   Controller,
+  Get,
   HttpCode,
   HttpStatus,
   Post,
+  Req,
   Res,
   UnauthorizedException,
 } from '@nestjs/common';
@@ -12,6 +14,7 @@ import { AuthService } from './services/auth.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { LoginDto } from './dto/login.dto';
 import { Public } from './decorators/public.decorator';
+import { RequestWithCookies } from '../common/interfaces/request-with-cookies.interface';
 
 @Controller('auth')
 export class AuthController {
@@ -34,13 +37,40 @@ export class AuthController {
     const result = await this.authService.login(loginDto);
 
     // If authentication fails, throw an UnauthorizedException
-    if (!result?.cookie) {
+    if (!result) {
       throw new UnauthorizedException('Incorrect email or password');
     }
 
-    const { cookie, user } = result;
-    // Set the JWT as cookie in the response object
-    res.cookie(cookie.name, cookie.value, cookie.options);
-    return user;
+    const { cookies, user } = result;
+    // Set the cookies in the response object
+    res
+      .cookie(
+        cookies.accessTokenCookie.name,
+        cookies.accessTokenCookie.value,
+        cookies.accessTokenCookie.options,
+      )
+      .cookie(
+        cookies.refreshTokenCookie.name,
+        cookies.refreshTokenCookie.value,
+        cookies.refreshTokenCookie.options,
+      )
+      .send({ user });
+  }
+
+  @Public()
+  @Get('refresh')
+  async refreshToken(@Req() req: RequestWithCookies, @Res() res: Response) {
+    const accessToken = await this.authService.refreshToken(req);
+
+    res
+      .cookie('access_token', accessToken, {
+        httpOnly: true,
+        sameSite: 'lax',
+        secure: process.env.NODE_ENV === 'production',
+        expires: new Date(
+          Date.now() + Number(process.env.JWT_COOKIE_EXPIRES_IN) * 60 * 1000,
+        ),
+      })
+      .send({ message: 'Access token refreshed successfully.' });
   }
 }

@@ -3,10 +3,7 @@ import {
   BadRequestException,
   Inject,
   forwardRef,
-  Post,
   UnauthorizedException,
-  Req,
-  Res,
 } from '@nestjs/common';
 import { UserService } from '../../users/services/user.service';
 import { HashService } from './hash.service';
@@ -15,16 +12,12 @@ import { User } from '../../users/user.entity';
 import { LoginDto } from '../dto/login.dto';
 import { TokenService } from './token.service';
 import { CookieOptions, Request, Response } from 'express';
+import { RequestWithCookies } from '../../common/interfaces/request-with-cookies.interface';
 
 export interface JwtPayload {
   id: string;
   iat: number;
   exp: number;
-}
-
-// Extend the Request to include cookies (because Express.Request doesn't have it by default)
-interface RequestWithCookies extends Request {
-  cookies: { [key: string]: string };
 }
 
 @Injectable()
@@ -97,39 +90,21 @@ export class AuthService {
     return { cookies, user: safeUser };
   }
 
-  @Post('refresh')
-  async refreshToken(@Req() req: RequestWithCookies, @Res() res: Response) {
+  async refreshToken(req: RequestWithCookies): Promise<string> {
     const refreshToken = req.cookies?.refresh_token;
 
     if (!refreshToken) {
       throw new UnauthorizedException('No refresh token provided.');
     }
 
-    let decoded: JwtPayload;
-    try {
-      decoded = await this.tokenService.verifyRefreshToken(refreshToken);
-    } catch {
-      throw new UnauthorizedException('Invalid or expired refresh token.');
-    }
+    const decoded = await this.tokenService.verifyRefreshToken(refreshToken);
 
     const user = await this.userService.getUserById(decoded.id);
     if (!user) {
       throw new UnauthorizedException('User does not exist.');
     }
 
-    // ✅ Only issue a new access token
-    const accessToken = await this.tokenService.createAccessToken(user.id);
-
-    res
-      .cookie('access_token', accessToken, {
-        httpOnly: true,
-        sameSite: 'lax',
-        secure: process.env.NODE_ENV === 'production',
-        expires: new Date(
-          Date.now() +
-            Number(process.env.JWT_COOKIE_EXPIRES_IN) * 60 * 60 * 1000,
-        ),
-      })
-      .send({ message: 'Access token refreshed successfully.' });
+    // Only issue a new access token
+    return await this.tokenService.createAccessToken(user.id);
   }
 }
