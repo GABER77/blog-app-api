@@ -2,10 +2,10 @@ import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { CookieOptions } from 'express';
 
-interface JwtPayload {
+export interface JwtPayload {
   id: string;
-  iat?: number;
-  exp?: number;
+  iat: number;
+  exp: number;
 }
 
 @Injectable()
@@ -58,7 +58,7 @@ export class TokenService {
   }
 
   // Generate access token
-  private createAccessToken(userId: string): Promise<string> {
+  createAccessToken(userId: string): Promise<string> {
     return this.jwtService.signAsync(
       { id: userId },
       {

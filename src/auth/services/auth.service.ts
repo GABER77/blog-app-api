@@ -3,6 +3,10 @@ import {
   BadRequestException,
   Inject,
   forwardRef,
+  Post,
+  UnauthorizedException,
+  Req,
+  Res,
 } from '@nestjs/common';
 import { UserService } from '../../users/services/user.service';
 import { HashService } from './hash.service';
@@ -10,7 +14,18 @@ import { CreateUserDto } from '../dto/create-user.dto';
 import { User } from '../../users/user.entity';
 import { LoginDto } from '../dto/login.dto';
 import { TokenService } from './token.service';
-import { CookieOptions } from 'express';
+import { CookieOptions, Request, Response } from 'express';
+
+export interface JwtPayload {
+  id: string;
+  iat: number;
+  exp: number;
+}
+
+// Extend the Request to include cookies (because Express.Request doesn't have it by default)
+interface RequestWithCookies extends Request {
+  cookies: { [key: string]: string };
+}
 
 @Injectable()
 export class AuthService {
@@ -45,7 +60,18 @@ export class AuthService {
   }
 
   async login(loginDto: LoginDto): Promise<{
-    cookie: { name: string; value: string; options: CookieOptions };
+    cookies: {
+      accessTokenCookie: {
+        name: string;
+        value: string;
+        options: CookieOptions;
+      };
+      refreshTokenCookie: {
+        name: string;
+        value: string;
+        options: CookieOptions;
+      };
+    };
     user: Omit<User, 'password'>;
   } | null> {
     // Check if a user with this email already exists
@@ -61,13 +87,49 @@ export class AuthService {
     // If the password does not match, return null (invalid credentials)
     if (!isPasswordMatch) return null;
 
-    // Create secure JWT cookie
-    const cookie = await this.tokenService.createCookie(user.id);
+    // Create access token and refresh token
+    const cookies = await this.tokenService.generateTokenCookies(user.id);
 
     // Exclude the hashed password from the returned response
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { password, ...safeUser } = user;
 
-    return { cookie, user: safeUser };
+    return { cookies, user: safeUser };
+  }
+
+  @Post('refresh')
+  async refreshToken(@Req() req: RequestWithCookies, @Res() res: Response) {
+    const refreshToken = req.cookies?.refresh_token;
+
+    if (!refreshToken) {
+      throw new UnauthorizedException('No refresh token provided.');
+    }
+
+    let decoded: JwtPayload;
+    try {
+      decoded = await this.tokenService.verifyRefreshToken(refreshToken);
+    } catch {
+      throw new UnauthorizedException('Invalid or expired refresh token.');
+    }
+
+    const user = await this.userService.getUserById(decoded.id);
+    if (!user) {
+      throw new UnauthorizedException('User does not exist.');
+    }
+
+    // ✅ Only issue a new access token
+    const accessToken = await this.tokenService.createAccessToken(user.id);
+
+    res
+      .cookie('access_token', accessToken, {
+        httpOnly: true,
+        sameSite: 'lax',
+        secure: process.env.NODE_ENV === 'production',
+        expires: new Date(
+          Date.now() +
+            Number(process.env.JWT_COOKIE_EXPIRES_IN) * 60 * 60 * 1000,
+        ),
+      })
+      .send({ message: 'Access token refreshed successfully.' });
   }
 }
