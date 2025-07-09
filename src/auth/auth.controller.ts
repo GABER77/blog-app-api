@@ -22,8 +22,28 @@ export class AuthController {
 
   @Public()
   @Post('signup')
-  async signup(@Body() createUserDto: CreateUserDto) {
-    return this.authService.signup(createUserDto);
+  async signup(
+    @Body() createUserDto: CreateUserDto,
+    @Res({ passthrough: true }) res: Response,
+  ) {
+    // Register the user and get back tokens and user object
+    const result = await this.authService.signup(createUserDto);
+
+    const { cookies, user } = result;
+
+    // Set the access & refresh tokens as HTTP-only cookies
+    res
+      .cookie(
+        cookies.accessTokenCookie.name,
+        cookies.accessTokenCookie.value,
+        cookies.accessTokenCookie.options,
+      )
+      .cookie(
+        cookies.refreshTokenCookie.name,
+        cookies.refreshTokenCookie.value,
+        cookies.refreshTokenCookie.options,
+      )
+      .send({ user });
   }
 
   @Public()
@@ -33,7 +53,7 @@ export class AuthController {
     @Body() loginDto: LoginDto,
     @Res({ passthrough: true }) res: Response,
   ) {
-    // Validate user and generate a secure JWT cookie
+    // Validate user and get back tokens and user object
     const result = await this.authService.login(loginDto);
 
     // If authentication fails, throw an UnauthorizedException
@@ -42,7 +62,8 @@ export class AuthController {
     }
 
     const { cookies, user } = result;
-    // Set the cookies in the response object
+
+    // Set the access & refresh tokens as HTTP-only cookies
     res
       .cookie(
         cookies.accessTokenCookie.name,

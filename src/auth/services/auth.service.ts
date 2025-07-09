@@ -29,8 +29,22 @@ export class AuthService {
     private readonly tokenService: TokenService,
   ) {}
 
-  async signup(createUserDto: CreateUserDto): Promise<Omit<User, 'password'>> {
-    // Check if a user with this email already exists
+  async signup(createUserDto: CreateUserDto): Promise<{
+    cookies: {
+      accessTokenCookie: {
+        name: string;
+        value: string;
+        options: CookieOptions;
+      };
+      refreshTokenCookie: {
+        name: string;
+        value: string;
+        options: CookieOptions;
+      };
+    };
+    user: Omit<User, 'password'>;
+  }> {
+    // Check for existing user with same email
     const existing = await this.userService.getUserByEmail(createUserDto.email);
     if (existing) {
       throw new BadRequestException('User with this email already exists.');
@@ -46,10 +60,13 @@ export class AuthService {
       password: hashedPassword,
     });
 
+    // Create access token and refresh token
+    const cookies = await this.tokenService.generateTokensCookies(user.id);
+
     // Exclude the hashed password from the returned response
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { password, ...safeUser } = user;
-    return safeUser;
+    return { cookies, user: safeUser };
   }
 
   async login(loginDto: LoginDto): Promise<{
