@@ -37,7 +37,7 @@ export class AuthService {
       accessTokenCookie: TokenCookie;
       refreshTokenCookie: TokenCookie;
     };
-    user: Omit<User, 'password'>;
+    user: User;
   }> {
     // Check for existing user with same email
     const existing = await this.userService.getUserByEmail(createUserDto.email);
@@ -58,10 +58,7 @@ export class AuthService {
     // Create access token and refresh token
     const cookies = await this.tokenService.generateTokensCookies(user.id);
 
-    // Exclude the hashed password from the returned response
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { password, ...safeUser } = user;
-    return { cookies, user: safeUser };
+    return { cookies, user };
   }
 
   async login(loginDto: LoginDto): Promise<{
@@ -89,11 +86,7 @@ export class AuthService {
     // Create access token and refresh token
     const cookies = await this.tokenService.generateTokensCookies(user.id);
 
-    // Exclude the hashed password from the returned response
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { password, ...safeUser } = user;
-
-    return { cookies, user: safeUser };
+    return { cookies, user };
   }
 
   async refreshToken(req: RequestWithCookies): Promise<string> {

@@ -1,6 +1,6 @@
-import { NestFactory } from '@nestjs/core';
+import { NestFactory, Reflector } from '@nestjs/core';
 import { AppModule } from './app.module';
-import { ValidationPipe } from '@nestjs/common';
+import { ClassSerializerInterceptor, ValidationPipe } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { GlobalExceptionFilter } from './common/filters/global-exception.filter';
 import * as cookieParser from 'cookie-parser';
@@ -32,6 +32,10 @@ async function bootstrap() {
   // Global Exception Filter
   // Handle DB related errors (e.g. failed .findOne, .save, .create, etc.)
   app.useGlobalFilters(new GlobalExceptionFilter());
+
+  // Remove fields marked with @Exclude() in your entity when returning responses
+  const reflector = app.get(Reflector);
+  app.useGlobalInterceptors(new ClassSerializerInterceptor(reflector));
 
   // Swagger Configuration
   const config = new DocumentBuilder()

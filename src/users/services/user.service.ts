@@ -73,9 +73,6 @@ export class UserService {
       );
     }
 
-    // Exclude the hashed password from the returned response
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { password, ...result } = updatedUser;
-    return result;
+    return updatedUser;
   }
 }

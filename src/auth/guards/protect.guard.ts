@@ -5,7 +5,6 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
-import { JwtService } from '@nestjs/jwt';
 import { UserService } from 'src/users/services/user.service';
 import { Request } from 'express';
 import { IS_PUBLIC_KEY } from '../decorators/public.decorator';
@@ -19,7 +18,6 @@ interface RequestWithCookies extends Request {
 @Injectable()
 export class ProtectGuard implements CanActivate {
   constructor(
-    private readonly jwtService: JwtService,
     private readonly userService: UserService,
     private readonly reflector: Reflector,
     private readonly tokenService: TokenService,
@@ -78,7 +76,7 @@ export class ProtectGuard implements CanActivate {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { password, ...safeUser } = user;
 
-    // All checks passed. Attach user to request for downstream access
+    // All checks passed, attach user object to request
     request['user'] = safeUser;
 
     // Allow the request to proceed to the controller

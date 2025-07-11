@@ -1,3 +1,4 @@
+import { Exclude } from 'class-transformer';
 import { Post } from 'src/posts/entities/post.entity';
 import {
   BeforeInsert,
@@ -13,6 +14,7 @@ export class User {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
+  @Exclude()
   @Column({ nullable: true })
   googleId?: string;
 
@@ -22,15 +24,18 @@ export class User {
   @Column({ unique: true })
   email: string;
 
+  @Exclude()
   @Column({ nullable: true })
   password?: string;
 
   @Column({ nullable: true })
   photo: string;
 
+  @Exclude()
   @CreateDateColumn()
   createdAt: Date;
 
+  @Exclude()
   @Column({ type: 'timestamp', nullable: true })
   passwordChangedAt: Date;
 
