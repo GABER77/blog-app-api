@@ -4,6 +4,7 @@ import { ClassSerializerInterceptor, ValidationPipe } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { GlobalExceptionFilter } from './common/filters/global-exception.filter';
 import * as cookieParser from 'cookie-parser';
+import { DataResponseInterceptor } from './common/interceptors/data-response.interceptor';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -33,9 +34,13 @@ async function bootstrap() {
   // Handle DB related errors (e.g. failed .findOne, .save, .create, etc.)
   app.useGlobalFilters(new GlobalExceptionFilter());
 
-  // Remove fields marked with @Exclude() in your entity when returning responses
+  // Global Interceptors
   const reflector = app.get(Reflector);
-  app.useGlobalInterceptors(new ClassSerializerInterceptor(reflector));
+  app.useGlobalInterceptors(
+    // Remove fields marked with @Exclude() in your entity when returning responses
+    new ClassSerializerInterceptor(reflector),
+    new DataResponseInterceptor(),
+  );
 
   // Swagger Configuration
   const config = new DocumentBuilder()

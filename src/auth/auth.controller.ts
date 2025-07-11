@@ -46,7 +46,7 @@ export class AuthController {
         cookies.refreshTokenCookie.value,
         cookies.refreshTokenCookie.options,
       );
-    return { user };
+    return user;
   }
 
   @Public()
@@ -78,7 +78,7 @@ export class AuthController {
         cookies.refreshTokenCookie.value,
         cookies.refreshTokenCookie.options,
       );
-    return { user };
+    return user;
   }
 
   @Public()

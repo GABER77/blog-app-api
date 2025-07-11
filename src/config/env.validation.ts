@@ -28,4 +28,7 @@ export const envValidationSchema = Joi.object({
 
   // Bcrypt
   BCRYPT_SALT_ROUNDS: Joi.number().default(12),
+
+  // API Version
+  API_VERSION: Joi.string().required(),
 });
