@@ -42,6 +42,7 @@ export class UserService {
   }
 
   async getUserByEmail(email: string): Promise<User | null> {
+    if (!email) return null;
     return this.userRepo.findOne({ where: { email } });
   }
 

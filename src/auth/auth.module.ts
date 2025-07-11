@@ -5,10 +5,11 @@ import { UserModule } from 'src/users/user.module';
 import { HashService } from './services/hash.service';
 import { TokenService } from './services/token.service';
 import { JwtModule } from '@nestjs/jwt';
+import { GoogleStrategy } from './strategies/google.strategy';
 
 @Module({
   controllers: [AuthController],
-  providers: [AuthService, HashService, TokenService],
+  providers: [AuthService, HashService, TokenService, GoogleStrategy],
   exports: [AuthService, JwtModule, TokenService],
   imports: [forwardRef(() => UserModule), JwtModule],
 })

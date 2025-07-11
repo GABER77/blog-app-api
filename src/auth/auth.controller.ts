@@ -8,13 +8,16 @@ import {
   Req,
   Res,
   UnauthorizedException,
+  UseGuards,
 } from '@nestjs/common';
 import { Response } from 'express';
 import { AuthService } from './services/auth.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { LoginDto } from './dto/login.dto';
 import { Public } from './decorators/public.decorator';
-import { RequestWithCookies } from '../common/interfaces/request-with-cookies.interface';
+import { RequestWithCookies } from './interfaces/auth-interfaces';
+import { GoogleAuthGuard } from './guards/google-auth.guard';
+import { RequestWithUser } from './interfaces/auth-interfaces';
 
 @Controller('auth')
 export class AuthController {
@@ -93,5 +96,31 @@ export class AuthController {
         ),
       })
       .send({ message: 'Access token refreshed successfully.' });
+  }
+
+  @Public()
+  @Get('google')
+  @UseGuards(GoogleAuthGuard)
+  async googleLogin() {
+    // Passport takes care of redirecting to Google
+  }
+
+  @Public()
+  @Get('google/callback')
+  @UseGuards(GoogleAuthGuard) // This Guard calls your validate() method to build the user object and attach it to the request
+  async googleCallback(@Req() req: RequestWithUser, @Res() res: Response) {
+    const { cookies } = await this.authService.googleLogin(req.user);
+    res
+      .cookie(
+        cookies.accessTokenCookie.name,
+        cookies.accessTokenCookie.value,
+        cookies.accessTokenCookie.options,
+      )
+      .cookie(
+        cookies.refreshTokenCookie.name,
+        cookies.refreshTokenCookie.value,
+        cookies.refreshTokenCookie.options,
+      )
+      .redirect(process.env.GOOGLE_SUCCESS_REDIRECT || '/');
   }
 }

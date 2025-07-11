@@ -11,8 +11,11 @@ import { CreateUserDto } from '../dto/create-user.dto';
 import { User } from '../../users/user.entity';
 import { LoginDto } from '../dto/login.dto';
 import { TokenService } from './token.service';
-import { CookieOptions, Request, Response } from 'express';
-import { RequestWithCookies } from '../../common/interfaces/request-with-cookies.interface';
+import {
+  RequestWithCookies,
+  GoogleUser,
+  TokenCookie,
+} from '../interfaces/auth-interfaces';
 
 export interface JwtPayload {
   id: string;
@@ -31,16 +34,8 @@ export class AuthService {
 
   async signup(createUserDto: CreateUserDto): Promise<{
     cookies: {
-      accessTokenCookie: {
-        name: string;
-        value: string;
-        options: CookieOptions;
-      };
-      refreshTokenCookie: {
-        name: string;
-        value: string;
-        options: CookieOptions;
-      };
+      accessTokenCookie: TokenCookie;
+      refreshTokenCookie: TokenCookie;
     };
     user: Omit<User, 'password'>;
   }> {
@@ -71,22 +66,16 @@ export class AuthService {
 
   async login(loginDto: LoginDto): Promise<{
     cookies: {
-      accessTokenCookie: {
-        name: string;
-        value: string;
-        options: CookieOptions;
-      };
-      refreshTokenCookie: {
-        name: string;
-        value: string;
-        options: CookieOptions;
-      };
+      accessTokenCookie: TokenCookie;
+      refreshTokenCookie: TokenCookie;
     };
     user: Omit<User, 'password'>;
   } | null> {
     // Check if a user with this email already exists
     const user = await this.userService.getUserByEmail(loginDto.email);
-    if (!user) return null;
+    //If user doesn't exist or If user exists but has no password (signed up via Google)
+    //Then treat this as invalid login using email/password
+    if (!user || !user.password) return null;
 
     // Compare the provided password with the stored hashed password
     const isPasswordMatch = await this.hashService.compare(
@@ -123,5 +112,21 @@ export class AuthService {
 
     // Only issue a new access token
     return await this.tokenService.createAccessToken(user.id);
+  }
+
+  async googleLogin(googleUser: GoogleUser): Promise<{
+    cookies: {
+      accessTokenCookie: TokenCookie;
+      refreshTokenCookie: TokenCookie;
+    };
+  }> {
+    let user = await this.userService.getUserByEmail(googleUser.email);
+
+    if (!user) {
+      user = await this.userService.createUser(googleUser);
+    }
+
+    const cookies = await this.tokenService.generateTokensCookies(user.id);
+    return { cookies };
   }
 }
