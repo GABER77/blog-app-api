@@ -4,6 +4,7 @@ import { ClassSerializerInterceptor, ValidationPipe } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { GlobalExceptionFilter } from './common/filters/global-exception.filter';
 import * as cookieParser from 'cookie-parser';
+import * as AWS from 'aws-sdk';
 import { DataResponseInterceptor } from './common/interceptors/data-response.interceptor';
 
 async function bootstrap() {
@@ -41,6 +42,15 @@ async function bootstrap() {
     new ClassSerializerInterceptor(reflector),
     new DataResponseInterceptor(),
   );
+
+  // Initialize AWS S3 as runtime assignment of a global variable
+  globalThis.s3 = new AWS.S3({
+    region: process.env.AWS_REGION,
+    credentials: {
+      accessKeyId: process.env.AWS_ACCESS_KEY_ID!,
+      secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY!,
+    },
+  });
 
   // Swagger Configuration
   const config = new DocumentBuilder()

@@ -11,6 +11,7 @@ import { User } from '../user.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { HandlerFactory } from 'src/common/utils/handler-factory';
 import { UpdateUserDto } from '../dto/update-user.dto';
+import { uploadImage } from 'src/common/upload/upload.service';
 
 @Injectable()
 export class UserService {
@@ -51,10 +52,7 @@ export class UserService {
     return await this.userRepo.save(user);
   }
 
-  async updateUser(
-    id: string,
-    updateUserDto: UpdateUserDto,
-  ): Promise<Omit<User, 'password'>> {
+  async updateUser(id: string, updateUserDto: UpdateUserDto): Promise<User> {
     // Find the user by ID
     const user = await this.userRepo.findOne({ where: { id } });
     if (!user) {
@@ -74,5 +72,26 @@ export class UserService {
     }
 
     return updatedUser;
+  }
+
+  async updateProfileImage(
+    userId: string,
+    file: Express.Multer.File,
+  ): Promise<User> {
+    // Check if the user exist
+    const user = await this.userRepo.findOne({ where: { id: userId } });
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    // Upload the image and save the image URL to the user entity
+    try {
+      const imageUrl = await uploadImage(file);
+      user.profileImage = imageUrl;
+
+      return this.userRepo.save(user);
+    } catch {
+      throw new InternalServerErrorException('Failed to upload profile image');
+    }
   }
 }

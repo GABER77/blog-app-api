@@ -29,7 +29,7 @@ export class User {
   password?: string;
 
   @Column({ nullable: true })
-  photo: string;
+  profileImage: string;
 
   @Exclude()
   @CreateDateColumn()

@@ -8,7 +8,9 @@ import {
   Req,
   Res,
   UnauthorizedException,
+  UploadedFile,
   UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
 import { Response } from 'express';
 import { AuthService } from './services/auth.service';
@@ -18,6 +20,9 @@ import { Public } from './decorators/public.decorator';
 import { RequestWithCookies } from './interfaces/auth-interfaces';
 import { GoogleAuthGuard } from './guards/google-auth.guard';
 import { RequestWithUser } from './interfaces/auth-interfaces';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { multerOptions } from 'src/common/upload/multer-options';
+import { uploadImage } from 'src/common/upload/upload.service';
 
 @Controller('auth')
 export class AuthController {
@@ -25,10 +30,19 @@ export class AuthController {
 
   @Public()
   @Post('signup')
+  @UseInterceptors(FileInterceptor('profileImage', multerOptions))
+  // when do swagger, mentions that the content type is multipart/form-data
   async signup(
+    @UploadedFile() file: Express.Multer.File,
     @Body() createUserDto: CreateUserDto,
     @Res({ passthrough: true }) res: Response,
   ) {
+    // Upload the profile image if present
+    if (file) {
+      const imageUrl = await uploadImage(file);
+      createUserDto.profileImage = imageUrl;
+    }
+
     // Register the user and get back tokens and user object
     const result = await this.authService.signup(createUserDto);
 

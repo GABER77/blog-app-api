@@ -45,6 +45,11 @@ export class AuthService {
       throw new BadRequestException('User with this email already exists.');
     }
 
+    // Check if passwords match
+    if (createUserDto.password !== createUserDto.passwordConfirm) {
+      throw new BadRequestException('Passwords do not match.');
+    }
+
     // Hash the password before saving it to the database
     const hashedPassword = await this.hashService.hash(createUserDto.password);
 

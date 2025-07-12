@@ -16,8 +16,4 @@ export class UpdateUserDto {
   @IsEmail({}, { message: 'Please enter a valid email address.' })
   @IsOptional()
   email?: string;
-
-  @IsOptional()
-  @IsString()
-  photo?: string;
 }
