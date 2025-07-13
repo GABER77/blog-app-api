@@ -14,6 +14,7 @@ import * as path from 'path';
         transport: {
           host: config.get<string>('EMAIL_HOST'),
           port: config.get<number>('EMAIL_PORT'),
+          secure: false,
           auth: {
             user: config.get<string>('EMAIL_USERNAME'),
             pass: config.get<string>('EMAIL_PASSWORD'),
@@ -26,7 +27,7 @@ import * as path from 'path';
           dir: path.join(__dirname, 'templates'),
           adapter: new EjsAdapter(),
           options: {
-            strict: true,
+            strict: false,
           },
         },
       }),
