@@ -36,7 +36,12 @@ export const uploadImage = async (
     })
     .promise(); // Execute the upload and return a promise
 
-  return uploadResult.Location; // Return the public URL of the uploaded image
+  /**
+   * Return the public URL of the uploaded image
+   * We didn't use cloudfront here because it return a cached version of the image
+   * Even if the file has been replaced in S3 storage
+   */
+  return uploadResult.Location;
 };
 
 // Uploads a temporary image and returns its key
@@ -97,5 +102,6 @@ export const moveImageToFinalPath = async (
     })
     .promise();
 
-  return `https://${process.env.AWS_S3_BUCKET_NAME!}.s3.amazonaws.com/${finalKey}`;
+  // Return CloudFront URL of the uploaded image
+  return `${process.env.CLOUDFRONT_URL}/${finalKey}`;
 };
