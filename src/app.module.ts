@@ -11,6 +11,7 @@ import { typeOrmConfig } from './config/typeorm.config';
 import { envValidationSchema } from './config/env.validation';
 import { APP_GUARD } from '@nestjs/core';
 import { ProtectGuard } from './auth/guards/protect.guard';
+import { MailModule } from './mail/mail.module';
 
 @Module({
   imports: [
@@ -29,6 +30,7 @@ import { ProtectGuard } from './auth/guards/protect.guard';
     PostModule,
     AuthModule,
     TagModule,
+    MailModule,
   ],
   controllers: [AppController],
   providers: [

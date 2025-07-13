@@ -33,6 +33,15 @@ export const envValidationSchema = Joi.object({
   AWS_SECRET_ACCESS_KEY: Joi.string().required(),
   CLOUDFRONT_URL: Joi.string().uri().required(),
 
+  // Mailtrap Configuration
+  EMAIL_HOST: Joi.string().required(),
+  EMAIL_PORT: Joi.number().port().required(),
+  EMAIL_USERNAME: Joi.string().required(),
+  EMAIL_PASSWORD: Joi.string().required(),
+
+  // Default sender email address
+  EMAIL_FROM: Joi.string().required(),
+
   // Bcrypt
   BCRYPT_SALT_ROUNDS: Joi.number().default(12),
 

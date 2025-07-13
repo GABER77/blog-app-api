@@ -4,6 +4,7 @@ import {
   Inject,
   forwardRef,
   UnauthorizedException,
+  RequestTimeoutException,
 } from '@nestjs/common';
 import { UserService } from '../../users/services/user.service';
 import { HashService } from './hash.service';
@@ -16,6 +17,7 @@ import {
   GoogleUser,
   TokenCookie,
 } from '../interfaces/auth-interfaces';
+import { MailService } from 'src/mail/services/mail.service';
 
 export interface JwtPayload {
   id: string;
@@ -30,6 +32,7 @@ export class AuthService {
     private readonly userService: UserService,
     private readonly hashService: HashService,
     private readonly tokenService: TokenService,
+    private readonly mailService: MailService,
   ) {}
 
   async signup(createUserDto: CreateUserDto): Promise<{
@@ -59,6 +62,14 @@ export class AuthService {
       ...createUserDto,
       password: hashedPassword,
     });
+
+    // Send welcome email after user is created
+    try {
+      await this.mailService.sendWelcomeEmail(user.email, user.name);
+    } catch (error) {
+      console.error('Failed to send welcome email:', error);
+      throw new RequestTimeoutException('Failed to send welcome email');
+    }
 
     // Create access token and refresh token
     const cookies = await this.tokenService.generateTokensCookies(user.id);
