@@ -23,11 +23,18 @@ import { GoogleAuthGuard } from './guards/google-auth.guard';
 import { RequestWithUser } from './interfaces/auth-interfaces';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { multerOptions } from 'src/common/upload/multer-options';
-import { uploadImage } from 'src/common/upload/upload.service';
+import {
+  moveImageToFinalPath,
+  uploadTempImage,
+} from 'src/common/upload/upload.service';
+import { UserService } from 'src/users/services/user.service';
 
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(
+    private readonly authService: AuthService,
+    private readonly userService: UserService,
+  ) {}
 
   @Public()
   @Post('signup')
@@ -38,22 +45,34 @@ export class AuthController {
     @Body() createUserDto: CreateUserDto,
     @Res({ passthrough: true }) res: Response,
   ) {
-    // Upload the profile image if present
+    let tempKey: string | undefined;
+
+    // If image is uploaded, upload it to temporary S3 path
     if (file) {
       try {
-        const imageUrl = await uploadImage(file);
-        createUserDto.profileImage = imageUrl;
-      } catch {
-        throw new InternalServerErrorException(
-          'Failed to upload profile image',
-        );
+        // Store temporarily untill user ID is available
+        tempKey = await uploadTempImage(file);
+      } catch (err) {
+        console.error('❌ Image upload failed:', err);
+        throw new InternalServerErrorException('Failed to upload image');
       }
     }
 
-    // Register the user and get back tokens and user object
+    // Create the user and receive tokens and user object
     const result = await this.authService.signup(createUserDto);
-
     const { cookies, user } = result;
+
+    // If image was uploaded earlier, move it to permanent path
+    if (tempKey) {
+      try {
+        const finalUrl = await moveImageToFinalPath(tempKey, user.id);
+        user.profileImage = finalUrl;
+        // Update user.profileImage in DB
+        await this.userService.updateUserImageUrl(user.id, finalUrl);
+      } catch (err) {
+        console.error('Image move failed:', err);
+      }
+    }
 
     // Set the access & refresh tokens as HTTP-only cookies
     res

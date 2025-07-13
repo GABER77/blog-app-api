@@ -84,14 +84,19 @@ export class UserService {
       throw new NotFoundException('User not found');
     }
 
-    // Upload the image and save the image URL to the user entity
+    // Upload the image and save the image URL to the user object
     try {
-      const imageUrl = await uploadImage(file);
+      const imageUrl = await uploadImage(file, userId);
       user.profileImage = imageUrl;
-
       return this.userRepo.save(user);
-    } catch {
+    } catch (err) {
+      console.error('❌ Image upload failed:', err);
       throw new InternalServerErrorException('Failed to upload profile image');
     }
+  }
+
+  async updateUserImageUrl(userId: string, imageUrl: string): Promise<void> {
+    // Update only the profileImage field of the user by ID
+    await this.userRepo.update(userId, { profileImage: imageUrl });
   }
 }
