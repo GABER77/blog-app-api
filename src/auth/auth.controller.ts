@@ -4,6 +4,7 @@ import {
   Get,
   HttpCode,
   HttpStatus,
+  InternalServerErrorException,
   Post,
   Req,
   Res,
@@ -39,8 +40,14 @@ export class AuthController {
   ) {
     // Upload the profile image if present
     if (file) {
-      const imageUrl = await uploadImage(file);
-      createUserDto.profileImage = imageUrl;
+      try {
+        const imageUrl = await uploadImage(file);
+        createUserDto.profileImage = imageUrl;
+      } catch {
+        throw new InternalServerErrorException(
+          'Failed to upload profile image',
+        );
+      }
     }
 
     // Register the user and get back tokens and user object
