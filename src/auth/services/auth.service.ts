@@ -1,8 +1,6 @@
 import {
   Injectable,
   BadRequestException,
-  Inject,
-  forwardRef,
   UnauthorizedException,
   RequestTimeoutException,
 } from '@nestjs/common';
@@ -28,7 +26,6 @@ export interface JwtPayload {
 @Injectable()
 export class AuthService {
   constructor(
-    @Inject(forwardRef(() => UserService))
     private readonly userService: UserService,
     private readonly hashService: HashService,
     private readonly tokenService: TokenService,
