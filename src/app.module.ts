@@ -1,6 +1,4 @@
 import { Module } from '@nestjs/common';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
 import { UserModule } from 'src/users/user.module';
 import { PostModule } from './posts/post.module';
 import { AuthModule } from './auth/auth.module';
@@ -32,9 +30,7 @@ import { MailModule } from './mail/mail.module';
     TagModule,
     MailModule,
   ],
-  controllers: [AppController],
   providers: [
-    AppService,
     {
       // Apply ProtectGuard globally across the entire application
       provide: APP_GUARD,

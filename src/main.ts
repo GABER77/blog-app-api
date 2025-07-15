@@ -5,7 +5,7 @@ import { appCreate } from './app.create';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
-  // Add all middleware
+  // Add all middlewares
   appCreate(app);
 
   // Start the application
