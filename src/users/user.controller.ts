@@ -17,6 +17,7 @@ import { User } from './user.entity';
 import {
   SwaggerGetAllUsers,
   SwaggerGetUser,
+  SwaggerUpdateProfileImage,
   SwaggerUpdateUser,
 } from 'src/common/swagger/users.swagger';
 import { FileInterceptor } from '@nestjs/platform-express';
@@ -49,8 +50,8 @@ export class UserController {
   }
 
   @Patch(':id/profile-image')
+  @SwaggerUpdateProfileImage()
   @UseInterceptors(FileInterceptor('profileImage', multerOptions))
-  // when do swagger, mentions that the content type is multipart/form-data
   async updateProfileImage(
     @Param('id', new ParseUUIDPipe()) id: string,
     @UploadedFile() file: Express.Multer.File,

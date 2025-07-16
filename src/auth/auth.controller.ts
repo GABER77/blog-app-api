@@ -28,7 +28,16 @@ import {
   uploadTempImage,
 } from 'src/common/upload/upload.service';
 import { UserService } from 'src/users/services/user.service';
+import {
+  SwaggerGoogleAuth,
+  SwaggerGoogleCallback,
+  SwaggerLogin,
+  SwaggerRefreshToken,
+  SwaggerSignup,
+} from 'src/common/swagger/auth.swagger';
+import { ApiTags } from '@nestjs/swagger';
 
+@ApiTags('Auth')
 @Controller('auth')
 export class AuthController {
   constructor(
@@ -38,8 +47,8 @@ export class AuthController {
 
   @Public()
   @Post('signup')
+  @SwaggerSignup()
   @UseInterceptors(FileInterceptor('profileImage', multerOptions))
-  // when do swagger, mentions that the content type is multipart/form-data
   async signup(
     @UploadedFile() file: Express.Multer.File,
     @Body() createUserDto: CreateUserDto,
@@ -91,6 +100,7 @@ export class AuthController {
 
   @Public()
   @Post('login')
+  @SwaggerLogin()
   @HttpCode(HttpStatus.OK)
   async login(
     @Body() loginDto: LoginDto,
@@ -123,6 +133,7 @@ export class AuthController {
 
   @Public()
   @Get('refresh-token')
+  @SwaggerRefreshToken()
   async refreshToken(@Req() req: RequestWithCookies, @Res() res: Response) {
     const accessToken = await this.authService.refreshToken(req);
 
@@ -140,12 +151,14 @@ export class AuthController {
 
   @Public()
   @Get('google')
+  @SwaggerGoogleAuth()
   @UseGuards(GoogleAuthGuard)
   async googleLogin() {
     // Passport takes care of redirecting to Google
   }
 
   @Public()
+  @SwaggerGoogleCallback()
   @Get('google/callback')
   @UseGuards(GoogleAuthGuard) // This Guard calls your validate() method to build the user object and attach it to the request
   async googleCallback(@Req() req: RequestWithUser, @Res() res: Response) {

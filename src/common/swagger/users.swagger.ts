@@ -5,6 +5,7 @@ import {
   ApiResponse,
   ApiBody,
   ApiParam,
+  ApiConsumes,
 } from '@nestjs/swagger';
 import { UpdateUserDto } from '../../users/dto/update-user.dto';
 import { User } from '../../users/user.entity';
@@ -13,11 +14,10 @@ export const SwaggerGetAllUsers = () =>
   applyDecorators(
     ApiOperation({
       summary:
-        'Get all users with support for pagination, filtering, sorting, searching, and field limiting.',
+        'Retrieve all users with pagination, filtering, sorting, searching, and field selection.',
       description:
-        'You can filter by any field directly using query parameters (e.g. role=admin or age[gte]=18).',
+        'Filter by any field using query parameters (e.g., role=admin or age[gte]=18).',
     }),
-
     ApiResponse({
       status: 200,
       description: 'List of users returned successfully.',
@@ -74,18 +74,52 @@ export const SwaggerGetUser = () =>
 
 export const SwaggerUpdateUser = () =>
   applyDecorators(
-    ApiOperation({ summary: 'Update user fields (excluding password)' }),
+    ApiOperation({ summary: 'Update a user by ID (excluding password).' }),
     ApiParam({
       name: 'id',
       type: 'string',
-      description: 'UUID of the user to update',
+      description: 'UUID of the user to update.',
       example: '049076d2-fc27-48bb-9d07-6f21fa4f6345',
     }),
     ApiBody({ type: UpdateUserDto }),
     ApiResponse({
       status: 200,
-      description: 'User updated successfully',
+      description: 'User updated successfully.',
       type: User,
     }),
-    ApiResponse({ status: 404, description: 'User not found' }),
+    ApiResponse({ status: 404, description: 'User not found.' }),
+  );
+
+export const SwaggerUpdateProfileImage = () =>
+  applyDecorators(
+    ApiOperation({ summary: 'Update user profile image.' }),
+    ApiConsumes('multipart/form-data'),
+    ApiParam({
+      name: 'id',
+      type: 'string',
+      description: 'UUID of the user.',
+      example: '049076d2-fc27-48bb-9d07-6f21fa4f6345',
+    }),
+    ApiBody({
+      schema: {
+        type: 'object',
+        properties: {
+          profileImage: {
+            type: 'string',
+            format: 'binary',
+          },
+        },
+        required: ['profileImage'],
+      },
+    }),
+    ApiResponse({
+      status: 200,
+      description: 'Profile image updated successfully.',
+      type: User,
+    }),
+    ApiResponse({
+      status: 400,
+      description: 'Invalid request or missing file.',
+    }),
+    ApiResponse({ status: 404, description: 'User not found.' }),
   );

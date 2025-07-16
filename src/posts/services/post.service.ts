@@ -55,6 +55,10 @@ export class PostService {
   }
 
   public async deletePost(id: string) {
+    // Check if the post exist
+    const post = await this.postRepo.findOneBy({ id });
+    if (!post) throw new NotFoundException('Post not found');
+
     await this.postRepo.delete(id);
   }
 

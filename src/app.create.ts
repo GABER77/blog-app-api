@@ -11,8 +11,7 @@ import * as AWS from 'aws-sdk';
 import { DataResponseInterceptor } from './common/interceptors/data-response.interceptor';
 import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
-import compression from 'compression';
-import xssClean from 'xss-clean';
+import * as compression from 'compression';
 import * as express from 'express';
 
 export function appCreate(app: INestApplication) {
@@ -23,6 +22,28 @@ export function appCreate(app: INestApplication) {
     allowedHeaders: ['Content-Type', 'Authorization'],
     credentials: true, // // enable cookies and JWTs with credentials
   });
+
+  // Set secure HTTP headers
+  app.use(helmet());
+
+  // Body parser, Reading data from the body into req.body
+  // limit the body size to 10kb to prevent large payload attacks
+  app.use(express.json({ limit: '10kb' }));
+  app.use(express.urlencoded({ extended: true, limit: '10kb' }));
+
+  // Reading data from the cookies (req.cookies)
+  app.use(cookieParser());
+
+  // Enable compression to speed up response delivery
+  app.use(compression());
+
+  // Limit requests from same IP
+  const limiter = rateLimit({
+    limit: 500,
+    windowMs: 60 * 60 * 1000, // Maximum of 500 request in 1 hour
+    message: 'Too many requests from this IP, please try again after an hour',
+  });
+  app.use('/api', limiter);
 
   // Enable global validation pipe with strict rules
   app.useGlobalPipes(
@@ -69,29 +90,4 @@ export function appCreate(app: INestApplication) {
     .build();
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, document);
-
-  // Body parser, Reading data from the body into req.body
-  // limit the body size to 10kb to prevent large payload attacks
-  app.use(express.json({ limit: '10kb' }));
-  app.use(express.urlencoded({ extended: true, limit: '10kb' }));
-
-  // Reading data from the cookies (req.cookies)
-  app.use(cookieParser());
-
-  // Set secure HTTP headers
-  app.use(helmet());
-
-  // Limit requests from same IP
-  const limiter = rateLimit({
-    limit: 500,
-    windowMs: 60 * 60 * 1000, // Maximum of 500 request in 1 hour
-    message: 'Too many requests from this IP, please try again after an hour',
-  });
-  app.use('/api', limiter);
-
-  // Enable compression to speed up response delivery
-  app.use(compression());
-
-  // Data sanitization against XSS(Cross-Site Scripting) attacks
-  app.use((xssClean as () => any)());
 }

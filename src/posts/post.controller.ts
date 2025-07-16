@@ -10,11 +10,18 @@ import {
   Query,
 } from '@nestjs/common';
 import { PostService } from './services/post.service';
-import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiTags } from '@nestjs/swagger';
 import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
 import { Post as PostEntity } from './entities/post.entity';
 import { ActiveUser } from 'src/auth/decorators/active-user.decorator';
+import {
+  SwaggerCreatePost,
+  SwaggerDeletePost,
+  SwaggerGetAllPosts,
+  SwaggerGetPostByMetaOptionId,
+  SwaggerUpdatePost,
+} from 'src/common/swagger/posts.swagger';
 
 @Controller('posts')
 @ApiTags('Posts')
@@ -22,41 +29,31 @@ export class PostController {
   constructor(private readonly postService: PostService) {}
 
   @Get()
+  @SwaggerGetAllPosts()
   public getAllPosts(@Query() query: Record<string, string>) {
     return this.postService.getAllPosts(query);
   }
 
-  @ApiOperation({
-    summary: 'Create new post',
-  })
-  @ApiResponse({
-    status: 201,
-    description: 'You get 201 response if your post created successfully',
-  })
   @Post()
+  @SwaggerCreatePost()
   public createPost(
     @Body() createPostDto: CreatePostDto,
-    @ActiveUser('id') userId: string,
+    @ActiveUser('id', ParseUUIDPipe) userId: string,
   ) {
     return this.postService.createPost(createPostDto, userId);
   }
 
-  @ApiOperation({
-    summary: 'Uptates an existing post',
-  })
-  @ApiResponse({
-    status: 200,
-    description: 'You get 200 response if your post updated successfully',
-  })
   @Patch(':id')
+  @SwaggerUpdatePost()
   public updatePost(
-    @Param('id') id: string,
+    @Param('id', ParseUUIDPipe) id: string,
     @Body() dto: UpdatePostDto,
   ): Promise<PostEntity> {
     return this.postService.updatePost(id, dto);
   }
 
   @Delete(':id')
+  @SwaggerDeletePost()
   public async deletePost(@Param('id', new ParseUUIDPipe()) id: string) {
     await this.postService.deletePost(id);
     return {
@@ -67,6 +64,7 @@ export class PostController {
 
   // Get Post from MetaOption ID (based on bidirectional relation)
   @Get(':metaOptionId/post')
+  @SwaggerGetPostByMetaOptionId()
   public getPostByMetaOptionId(
     @Param('metaOptionId', ParseUUIDPipe) metaOptionId: string,
   ) {
