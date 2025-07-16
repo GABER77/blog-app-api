@@ -9,6 +9,8 @@ import { GlobalExceptionFilter } from './common/filters/global-exception.filter'
 import * as cookieParser from 'cookie-parser';
 import * as AWS from 'aws-sdk';
 import { DataResponseInterceptor } from './common/interceptors/data-response.interceptor';
+import helmet from 'helmet';
+import rateLimit from 'express-rate-limit';
 
 export function appCreate(app: INestApplication) {
   // Allow requests from other domains (Cross-Origin Resource Sharing)
@@ -67,4 +69,15 @@ export function appCreate(app: INestApplication) {
 
   // Reading data from the cookies (req.cookies)
   app.use(cookieParser());
+
+  // Set secure HTTP headers
+  app.use(helmet());
+
+  // Limit requests from same IP
+  const limiter = rateLimit({
+    limit: 500,
+    windowMs: 60 * 60 * 1000, // Maximum of 500 request in 1 hour
+    message: 'Too many requests from this IP, please try again after an hour',
+  });
+  app.use('/api', limiter);
 }
