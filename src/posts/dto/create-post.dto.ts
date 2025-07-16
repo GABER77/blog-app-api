@@ -18,9 +18,7 @@ import { postStatusEnum } from '../enums/postStatus.enum';
 import { CreatePostMetaOptonsDto } from './create-post-meta-options.dto';
 
 export class CreatePostDto {
-  @ApiProperty({
-    example: 'This is the post title',
-  })
+  @ApiProperty({ example: 'This is the post title' })
   @IsString()
   @MaxLength(500)
   @IsNotEmpty()
@@ -54,7 +52,7 @@ export class CreatePostDto {
   slug: string;
 
   @ApiPropertyOptional({
-    example: 'This is the post ontent',
+    example: 'This is the post content',
   })
   @IsString()
   @IsOptional()
@@ -69,7 +67,7 @@ export class CreatePostDto {
   imageUrl?: string;
 
   @ApiPropertyOptional({
-    description: 'Array of tags pass as string value',
+    description: 'Array of tags as string values',
     example: ['nest', 'typescript'],
   })
   @IsArray()
