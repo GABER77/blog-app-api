@@ -11,6 +11,8 @@ import * as AWS from 'aws-sdk';
 import { DataResponseInterceptor } from './common/interceptors/data-response.interceptor';
 import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
+import compression from 'compression';
+import xssClean from 'xss-clean';
 
 export function appCreate(app: INestApplication) {
   // Allow requests from other domains (Cross-Origin Resource Sharing)
@@ -80,4 +82,10 @@ export function appCreate(app: INestApplication) {
     message: 'Too many requests from this IP, please try again after an hour',
   });
   app.use('/api', limiter);
+
+  // Enable compression to speed up response delivery
+  app.use(compression());
+
+  // Data sanitization against XSS(Cross-Site Scripting) attacks
+  app.use((xssClean as () => any)());
 }
