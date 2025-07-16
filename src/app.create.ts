@@ -13,6 +13,7 @@ import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
 import compression from 'compression';
 import xssClean from 'xss-clean';
+import * as express from 'express';
 
 export function appCreate(app: INestApplication) {
   // Allow requests from other domains (Cross-Origin Resource Sharing)
@@ -68,6 +69,11 @@ export function appCreate(app: INestApplication) {
     .build();
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, document);
+
+  // Body parser, Reading data from the body into req.body
+  // limit the body size to 10kb to prevent large payload attacks
+  app.use(express.json({ limit: '10kb' }));
+  app.use(express.urlencoded({ extended: true, limit: '10kb' }));
 
   // Reading data from the cookies (req.cookies)
   app.use(cookieParser());
