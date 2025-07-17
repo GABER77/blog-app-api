@@ -130,3 +130,7 @@ API_VERSION=0.1.1
 - Never commit your `.env` files to version control
 - Configure CORS origin inside `app.create.ts` file to match your frontend domain
 - Run the project in production mode using: `npm run start:prod`
+
+## **Swagger Screenshot**
+
+<img src="https://github.com/user-attachments/assets/182ce1ae-dda5-4d08-98d4-61c56e5faaca" width="800">
