@@ -1,0 +1,457 @@
+{
+	"info": {
+		"_postman_id": "6b73cf85-2bfc-4dc8-8d84-d440186265a6",
+		"name": "Blog App API",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "34862922"
+	},
+	"item": [
+		{
+			"name": "Users",
+			"item": [
+				{
+					"name": "Auth",
+					"item": [
+						{
+							"name": "Sign Up",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "name",
+											"value": "Ali Nour",
+											"type": "text"
+										},
+										{
+											"key": "email",
+											"value": "ali@gmail.com",
+											"type": "text"
+										},
+										{
+											"key": "password",
+											"value": "test1234!",
+											"type": "text"
+										},
+										{
+											"key": "passwordConfirm",
+											"value": "test1234!",
+											"type": "text"
+										},
+										{
+											"key": "profileImage",
+											"type": "file",
+											"src": [],
+											"disabled": true
+										}
+									]
+								},
+								"url": {
+									"raw": "{{URL}}/auth/signup",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"auth",
+										"signup"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Login",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"email\": \"mohamed@gmail.com\",\r\n    \"password\": \"{{password}}\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{URL}}/auth/login",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"auth",
+										"login"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Refresh Token",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{URL}}/auth/refresh-token",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"auth",
+										"refresh-token"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Get All Users",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{URL}}/users?limit=5&page=1",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"users"
+							],
+							"query": [
+								{
+									"key": "role",
+									"value": "admin",
+									"disabled": true
+								},
+								{
+									"key": "search",
+									"value": "ahmed",
+									"disabled": true
+								},
+								{
+									"key": "sort",
+									"value": "createdAt",
+									"disabled": true
+								},
+								{
+									"key": "fields",
+									"value": "name,createdAt",
+									"disabled": true
+								},
+								{
+									"key": "limit",
+									"value": "5"
+								},
+								{
+									"key": "page",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get User",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{URL}}/users/aee591af-ac73-43da-8604-149e5e23d680",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"users",
+								"aee591af-ac73-43da-8604-149e5e23d680"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update User",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"email\": \"hassan@gmail.com\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{URL}}/users/aee591af-ac73-43da-8604-149e5e23d680",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"users",
+								"aee591af-ac73-43da-8604-149e5e23d680"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Profile Image",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "profileImage",
+									"type": "file",
+									"src": []
+								}
+							]
+						},
+						"url": {
+							"raw": "{{URL}}/users/104d4021-5ac4-4155-89c3-06ba4f634c69/profile-image",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"users",
+								"104d4021-5ac4-4155-89c3-06ba4f634c69",
+								"profile-image"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Posts",
+			"item": [
+				{
+					"name": "Get All Posts",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{URL}}/posts",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"posts"
+							],
+							"query": [
+								{
+									"key": "status",
+									"value": "published",
+									"disabled": true
+								},
+								{
+									"key": "search",
+									"value": "nest",
+									"disabled": true
+								},
+								{
+									"key": "sort",
+									"value": "-createdAt",
+									"disabled": true
+								},
+								{
+									"key": "fields",
+									"value": "title,status,createdAt",
+									"disabled": true
+								},
+								{
+									"key": "limit",
+									"value": "8",
+									"disabled": true
+								},
+								{
+									"key": "page",
+									"value": "1",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Posts",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"title\": \"firstPost\",\r\n    \"postType\": \"post\",\r\n    \"slug\": \"test-1\",\r\n    \"status\": \"draft\",\r\n    \"content\": \"test\",\r\n    \"tags\": [\"nestjs\",\"java\"],\r\n    \"metaOptions\": {\r\n        \"data\": {\r\n            \"allowComments\": true,\r\n            \"hideLikes\": false\r\n        }\r\n    }\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{URL}}/posts",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"posts"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Post",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"title\":\"new title\",\r\n    \"postType\": \"story\",\r\n    \"tags\": [\"nestjs\", \"dart\"],\r\n    \"metaOptions\": {\r\n        \"data\": {\r\n            \"hideLikes\": false\r\n        }\r\n    }\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{URL}}/posts/604a6874-4309-4c85-acff-ec51fb63a0ff",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"posts",
+								"604a6874-4309-4c85-acff-ec51fb63a0ff"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Post",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{URL}}/posts/604a6874-4309-4c85-acff-ec51fb63a0ff",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"posts",
+								"604a6874-4309-4c85-acff-ec51fb63a0ff"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Post By MetaOptions ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{URL}}/posts/9d149501-b04e-4741-909f-71d975f251c3/post",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"posts",
+								"9d149501-b04e-4741-909f-71d975f251c3",
+								"post"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Tags",
+			"item": [
+				{
+					"name": "Create Tags",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"tags\": [\"java\", \"nestjs\"]\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{URL}}/tags",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"tags"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get All Tags",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{URL}}/tags",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"tags"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Tag",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{URL}}/tags/7f355b5e-83c5-4aac-bc81-0548928d55d3",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"tags",
+								"7f355b5e-83c5-4aac-bc81-0548928d55d3"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}

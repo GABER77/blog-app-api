@@ -25,7 +25,7 @@ export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
       googleId: profile.id,
       name: profile.displayName,
       email: profile.emails?.[0]?.value,
-      photo: profile.photos?.[0]?.value,
+      profileImage: profile.photos?.[0]?.value,
     };
 
     // Tell Passport we're done, pass the user to the request pipeline
